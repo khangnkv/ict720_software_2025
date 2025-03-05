@@ -12,5 +12,6 @@ Waritthorn Na Nagara 6722040281
 # User Stories
 1. User 1: As a parent, I want to know when my baby needs care at night but I need rest too, so I want to sleep without worry
 2. User 2: As a parent, I want to check my babysitter whether he or she takes care of my child properly during my working hours for I am not available at home and it is risky if babysitter do something wrong without notify
-
+3. As a parent, I want to review recorded video and audio from the camera so I can ensure my child was properly cared for throughout the day.
+4. As a babysitter, I want to be alerted if the baby’s room temperature or humidity level becomes uncomfortable so I can adjust the environment for their well-being.
 
