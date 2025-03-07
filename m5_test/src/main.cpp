@@ -6,7 +6,7 @@
 const char* ssid = "XePlant_2.4G";
 const char* password = "ilove@coffee";
 const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
-const char* chatID = "6695811445";
+const char* chatID = "-4646258185";
 
 // Function declaration
 void sendTelegramMessage(String message);
