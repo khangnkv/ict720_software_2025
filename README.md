@@ -1,5 +1,7 @@
 # ict720_software_2025
 
+# Group BabyCare+
+
 # Member
 Khang Vinh Khac Nguyen 6722040661 \
 Tanagrid Rakwongrit 6714552220 \
