@@ -3,7 +3,7 @@
 # Group BabyCare+
 
 # Objective
-The objective of this project is to develop a baby monitoring system using the M5StickC and HAT Yun device, which detects motion and environmental changes and sends real-time notifications/aleart to parents through a Telegram bot. The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
+  The objective of this project is to develop a baby monitoring system using the M5StickC and HAT Yun device, which detects motion and environmental changes and sends real-time notifications/aleart to parents through a Telegram bot. The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
 
 # Member
 Khang Vinh Khac Nguyen 6722040661 \
