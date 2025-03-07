@@ -17,3 +17,11 @@ Waritthorn Na Nagara 6722040281
 3. User 3: As a different parent, I want to review recorded video and audio from the camera to ensure my child was properly cared for throughout the day.
 4. User 4: As a babysitter, I want to be alerted if the baby’s room temperature or humidity level becomes uncomfortable so I can adjust the environment for their well-being during my shift.
 
+
+# Software Models
+1. State Diagram
+2. Sequence Diagram
+3. Overview
+4. Connectivity
+5. Data Modeling
+6. Telegram Bot Alert
