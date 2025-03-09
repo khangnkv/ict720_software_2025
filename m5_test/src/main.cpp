@@ -37,7 +37,7 @@ void setup() {
 }
 
 void loop() {
-  // Nothing here for now
+  delay(100); // Delay to avoid spamming the Telegram API
 }
 
 void sendTelegramMessage(String message) {
