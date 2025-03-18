@@ -10,7 +10,7 @@ SHT20 sht20;
 Adafruit_BMP280 bmp;
 
 uint32_t update_time = 0;
-const char* ssid = "XePlant_2.4G";
+const char* ssid = "MOUREE-2.4G";
 const char* password = "ilove@coffee";
 const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
 const char* chatID = "-4646258185";
@@ -18,8 +18,6 @@ float accX, accY, accZ;
 float gyroX, gyroY, gyroZ;
 float tmp, hum;
 float pressure;
-const int micPin = 34;
-const int noiseThreshold = 3000;
 uint16_t light;
 
 // Function declaration
@@ -29,6 +27,16 @@ void setup() {
     M5.begin();
     Wire.begin(0, 26, 100000UL);
     M5.Imu.Init();
+    delay(1000);
+    // 🟢 Reduce CPU speed to save battery
+    setCpuFrequencyMhz(80); 
+    // 🟢 Turn off the display completely
+    M5.Axp.SetLDO2(false);  
+    // 🟢 Yun Hat LED
+    led_set_all(0x000000);
+    // 🟢 Enable WiFi sleep mode to save power
+    WiFi.setSleep(true);
+
 
     WiFi.begin(ssid, password);
     int attempts = 0;
@@ -59,11 +67,9 @@ void setup() {
     // put your setup code here, to run once:
 }
 
-uint8_t color_light = 5;
-
+uint8_t brightness = 1;  // Low brightness (0-255)
 void loop() {
-
-    led_set_all((color_light << 16) | (color_light << 8) | color_light);
+    led_set_all((brightness << 16) | (brightness << 8) | brightness); // Dim White LED
     if (millis() > update_time) {
         update_time = millis() + 1000;
         tmp         = sht20.read_temperature();
@@ -72,36 +78,34 @@ void loop() {
         pressure    = bmp.readPressure();
         M5.IMU.getAccelData(&accX, &accY, &accZ);
         M5.IMU.getGyroData(&gyroX, &gyroY, &gyroZ);
-        int noiseLevel = analogRead(micPin);
-        Serial.print("Noise Level: ");
-        Serial.println(noiseLevel);
-        Serial.printf("AX:%.2f,AY:%.2f,AZ:%.2f,GX:%.2f,GY:%.2f,GZ:%.2f,T:%.2fC\nH:%.2f\nP:%.2f\nN:%.2f\n",
-            accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure, noiseLevel);
+        Serial.printf("AX:%.2f,AY:%.2f,AZ:%.2f,GX:%.2f,GY:%.2f,GZ:%.2f,T:%.2fC\nH:%.2f\nP:%.2f\n",
+            accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure);
         // Temperature alert
         if (tmp > 32.0) {
             sendTelegramMessage("🔥 Temperature too high! Over 32°C!");
         }
 
         // Humidity alert
-        if (hum < 20.0) {
-            sendTelegramMessage("💧 Humidity too low! Below 20%!");
+        if (hum < 70) {
+            sendTelegramMessage("💧 Humidity too low! Below 70%!");
         }
         // Pressure alert
-        if (pressure > 101500) {
-            sendTelegramMessage("🌪 Pressure too high! Over 1015 hPa!");
+        if (pressure > 100000) {
+            sendTelegramMessage("🌪 Pressure too high! Over 1000 hPa!");
         }
 
         // Sudden movement alert
-        if (abs(accX) > 1.5 || abs(accY) > 1.5 || abs(accZ) > 1.5) {
+        if (abs(accX) > 0.7|| abs(accY) > 0.7 || abs(accZ) > 1.5) {
             sendTelegramMessage("⚠️ Sudden movement detected!");
         }
         char message[100];
-        snprintf(message, sizeof(message), "Sensor Data:\nAX:%.2f\nAY:%.2f\nAZ:%.2f\nGX:%.2f\nGY:%.2f\nGZ:%.2f\nT:%.2fC\nH:%.2f\nP:%.2f\nN:%.2f\n",
-           accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure, noiseLevel);
+        snprintf(message, sizeof(message), "Sensor Data:\nAX:%.2f\nAY:%.2f\nAZ:%.2f\nGX:%.2f\nGY:%.2f\nGZ:%.2f\nT:%.2fC\nH:%.2f\nP:%.2f\n",
+           accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure);
         sendTelegramMessage(message);
-
         // Delay for a minute
-        delay(10000);
+        // 🟢 Put the device into light sleep mode for 30 seconds to save power
+        esp_sleep_enable_timer_wakeup(30 * 1000000); // 30 seconds sleep
+        esp_light_sleep_start(); // Enter light sleep
         
     }
 
@@ -110,9 +114,7 @@ void loop() {
     if (M5.BtnA.wasPressed()) {
         esp_restart();
     }
-
-    delay(10);
-    // put your main code here, to run repeatedly:
+    delay(1000);
 }
 
 void sendTelegramMessage(const char* message) {
@@ -123,8 +125,10 @@ void sendTelegramMessage(const char* message) {
       http.begin(url);
       http.addHeader("Content-Type", "application/json");
   
-      //String payload = "{\"chat_id\":\"" + String(chatID) + "\",\"text\":\"" + String(message) + "\",""\"disable_notification\":false}";
-      String payload = "{\"chat_id\":\"" + String(chatID) + "\",\"text\":\"" + String(message) + "\"";
+      String payload = "{\"chat_id\":\"" + 
+                        String(chatID) +
+                        "\",\"text\":\"" + 
+                        String(message) + "\"";
       int httpResponseCode = http.POST(payload);
   
       if (httpResponseCode > 0) {
