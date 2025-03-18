@@ -5,8 +5,8 @@
 #include <esp_camera.h>
 
 // Wi-Fi and Telegram credentials
-const char* ssid = "MOUREE-2.4G";
-const char* password = "ilove@coffee";
+const char* ssid = "BY_DOM_2.4G";
+const char* password = "0961873889";
 const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
 const char* chatID = "-4646258185";
 
@@ -54,8 +54,16 @@ const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e
 #define SERIAL_TX_PIN    43
 #define BAT_VOLT_PIN     -1
 
+#define MAX_IMAGES 10
+uint8_t* imageBuffers[MAX_IMAGES]; // Array to hold image buffers
+size_t imageSizes[MAX_IMAGES];     // Array to hold image sizes
+
+
 void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
+void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
+int captureImages(int numImages);
+
 
 // Wi-Fi and HTTP clients
 WiFiClient espClient;
@@ -110,13 +118,14 @@ void setup() {
   // Camera initialization with resized image
   if (psramFound()) {
     Serial.println("PSRAM found. Using higher resolution and quality settings.");
-    config.frame_size = FRAMESIZE_SVGA; // Change to SVGA (800x600) for higher resolution
-    config.jpeg_quality = 10;           // Higher quality for better image
-    config.fb_count = 2;
+    config.frame_size = FRAMESIZE_SVGA; // Use QVGA (320x240) if PSRAM is unavailable
+    config.jpeg_quality = 10;           // Lower quality for smaller file size
+    // config.fb_count = 2;
+    config.fb_count = 1;
   } else {
     Serial.println("PSRAM not found. Using lower resolution and quality settings.");
     config.frame_size = FRAMESIZE_QVGA; // Use QVGA (320x240) if PSRAM is unavailable
-    config.jpeg_quality = 12;           // Lower quality for smaller file size
+    config.jpeg_quality = 20;           // Lower quality for smaller file size
     config.fb_count = 1;
   }
 
@@ -125,6 +134,8 @@ void setup() {
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
     return;
+  } else {
+    Serial.println("Camera initialized successfully");
   }
 }
 
@@ -144,18 +155,31 @@ void loop() {
   if (avg_val > noiseThreshold && millis() - lastAlertTime > alertCooldown) {
     sendTelegramMessage("🚨 Noise detected in baby's room! 🚨");
     // Capture and send photo
-    camera_fb_t * fb = esp_camera_fb_get();
-    if(fb && fb->len <= 15 * 1024) {
-      sendTelegramPhoto(fb->buf, fb->len);
+    // camera_fb_t * fb = esp_camera_fb_get();
+    // if(fb && fb->len <= 15 * 1024) {
+    //   sendTelegramPhoto(fb->buf, fb->len);
+    // } else {
+    //   Serial.println("img too large");
+    // } 
+    // if (fb) esp_camera_fb_return(fb);
+    // // Update the last alert time
+    // lastAlertTime = millis();
+    // Capture 10 images
+    int numCaptured = captureImages(10);
+
+    if (numCaptured > 0) {
+      std::vector<std::pair<const uint8_t*, size_t>> images;
+      for (int i = 0; i < numCaptured; i++) {
+        images.push_back({imageBuffers[i], imageSizes[i]});
+      }
+      sendTelegramPhotosAsGroup(images);
     } else {
-      Serial.println("img too large");
-    } 
-    if (fb) esp_camera_fb_return(fb);
-    // Update the last alert time
-    lastAlertTime = millis();
+      Serial.println("❌ No images captured.");
+    }
   }
   delay(1000); // Cooldown period
 }
+
 void sendTelegramMessage(const char* message) {
   if (WiFi.status() == WL_CONNECTED) {
     http.begin("https://api.telegram.org/bot" + String(botToken) + "/sendMessage");
@@ -218,4 +242,94 @@ void sendTelegramPhoto(const uint8_t* buffer, size_t length) {
   } else {
     Serial.println("Wi-Fi not connected!");
   }
+
+}
+void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images) {
+  if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("Wi-Fi not connected!");
+      return;
+  }
+
+  String boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
+  String url = "https://api.telegram.org/bot" + String(botToken) + "/sendMediaGroup";
+
+  http.begin(url);
+  http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+  // JSON array for media metadata
+  String mediaJson = "[";
+  for (size_t i = 0; i < images.size(); i++) {
+      if (i > 0) mediaJson += ",";
+      mediaJson += "{ \"type\": \"photo\", \"media\": \"attach://photo" + String(i) + "\" }";
+  }
+  mediaJson += "]";
+
+  // Start multipart body
+  String body = "--" + boundary + "\r\n";
+  body += "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n";
+  body += String(chatID) + "\r\n";
+
+  body += "--" + boundary + "\r\n";
+  body += "Content-Disposition: form-data; name=\"media\"\r\n\r\n";
+  body += mediaJson + "\r\n";
+
+  std::vector<uint8_t> requestData(body.begin(), body.end());
+
+  // Attach images
+  for (size_t i = 0; i < images.size(); i++) {
+      body = "--" + boundary + "\r\n";
+      body += "Content-Disposition: form-data; name=\"photo" + String(i) + "\"; filename=\"photo.jpg\"\r\n";
+      body += "Content-Type: image/jpeg\r\n\r\n";
+      
+      requestData.insert(requestData.end(), body.begin(), body.end());
+      requestData.insert(requestData.end(), images[i].first, images[i].first + images[i].second);
+      requestData.insert(requestData.end(), "\r\n", "\r\n" + 2);
+  }
+
+  // Close the request body
+  String closing = "--" + boundary + "--\r\n";
+  requestData.insert(requestData.end(), closing.begin(), closing.end());
+
+  // Send request
+  int httpResponseCode = http.POST(&requestData[0], requestData.size());
+
+  if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println("Photo group sent: " + response);
+  } else {
+      Serial.print("Error sending photo group: ");
+      Serial.println(httpResponseCode);
+  }
+
+  http.end();
+}
+// Capture 10 images in 5-second 
+int captureImages(int numImages) {
+  int capturedCount = 0;
+
+  for (int i = 0; i < numImages; i++) {
+      // Discard previous frame to avoid duplicates
+      esp_camera_fb_return(esp_camera_fb_get());
+      delay(100);
+
+      camera_fb_t* fb = esp_camera_fb_get();
+      if (!fb) {
+          Serial.println("Failed to capture image: " + String(i));
+          continue;
+      }
+
+      Serial.println("Captured image " + String(i) + " - Size: " + String(fb->len) + " bytes");
+
+      if (fb->len > 0) {
+          imageBuffers[i] = (uint8_t*)malloc(fb->len);
+          memcpy(imageBuffers[i], fb->buf, fb->len);
+          imageSizes[i] = fb->len;
+          capturedCount++;
+      }
+
+      esp_camera_fb_return(fb);
+      delay(500);
+  }
+
+  return capturedCount;
 }
