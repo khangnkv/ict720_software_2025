@@ -101,7 +101,7 @@ void loop() {
         sendTelegramMessage(message);
 
         // Delay for a minute
-        delay(1000);
+        delay(10000);
         
     }
 

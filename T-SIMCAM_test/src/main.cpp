@@ -63,6 +63,7 @@ void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
 int captureImages(int numImages);
+void checkTelegramMessages();
 
 
 // Wi-Fi and HTTP clients
@@ -176,6 +177,7 @@ void loop() {
     } else {
       Serial.println("❌ No images captured.");
     }
+  checkTelegramMessages();
   }
   delay(1000); // Cooldown period
 }
@@ -332,4 +334,40 @@ int captureImages(int numImages) {
   }
 
   return capturedCount;
+}
+
+void checkTelegramMessages() {
+  String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=-1";
+  http.begin(url);
+  
+  int httpResponseCode = http.GET();
+  
+  if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println("Telegram response: " + response);
+
+      if (response.indexOf("ALERT") != -1 ||
+      response.indexOf("Temperature too high!") != -1 || 
+      response.indexOf("Humidity too low!") != -1 || 
+      response.indexOf("Pressure too high!") != -1 || 
+      response.indexOf("Sudden movement detected!") != -1) {  // All keywords for alerts
+          Serial.println("🚨 ALERT detected! Capturing image...");
+
+          // Capture image
+          camera_fb_t *fb = esp_camera_fb_get();
+          if (!fb) {
+              Serial.println("Failed to capture image");
+              return;
+          }
+
+          // Send the captured image to Telegram
+          sendTelegramPhoto(fb->buf, fb->len);
+          esp_camera_fb_return(fb);
+      }
+  } else {
+      Serial.print("Error checking messages: ");
+      Serial.println(httpResponseCode);
+  }
+
+  http.end();
 }
