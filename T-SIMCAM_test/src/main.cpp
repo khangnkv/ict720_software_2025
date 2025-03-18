@@ -3,7 +3,7 @@
 #include <HTTPClient.h>
 #include "hw_mic.h"
 #include <esp_camera.h>
-
+#include <esp_heap_caps.h>
 // Wi-Fi and Telegram credentials
 const char* ssid = "BY_DOM_2.4G";
 const char* password = "0961873889";
@@ -12,8 +12,8 @@ const char* chatID = "-4646258185";
 
 // Microphone and noise detection
 int32_t mic_samples[1600];
-float avg_val = 0.0;
-const int noiseThreshold = 2000000;
+// float avg_val = 0.0;
+const int noiseThreshold = 55; // Noise threshold in dB
 
 unsigned long lastAlertTime = 0; // Track the last alert time
 const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e.g., 60 seconds) 
@@ -144,17 +144,23 @@ void loop() {
   unsigned int num_samples = 1600;
   hw_mic_read(mic_samples, &num_samples);
 
-  // Calculate average noise level
-  avg_val = 0.0;
-  for (int i = 0; i < 1600; i++) {
-    avg_val += abs(mic_samples[i]) / 1600.0;
+  // Calculate RMS (Root Mean Square) value
+  float sumSquares = 0.0;
+  for (int i = 0; i < num_samples; i++) {
+      sumSquares += (float)mic_samples[i] * mic_samples[i];
   }
+  float rms = sqrt(sumSquares / num_samples);
 
-  Serial.printf("Noise level: %.2f\n", avg_val);
+  // Normalize the RMS value to fit into a decibel scale
+  float referenceValue = 32768.0; // Assuming 16-bit microphone
+  float noiseLevel_dB = 20 * log10(rms / referenceValue);
+  Serial.printf("Noise level: %.2f dB\n", noiseLevel_dB);
 
   // Send alert if noise exceeds threshold
-  if (avg_val > noiseThreshold && millis() - lastAlertTime > alertCooldown) {
+  if (noiseLevel_dB > noiseThreshold && millis() - lastAlertTime > alertCooldown) {
     sendTelegramMessage("🚨 Noise detected in baby's room! 🚨");
+    sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
+    lastAlertTime = millis();
     // Capture and send photo
     // camera_fb_t * fb = esp_camera_fb_get();
     // if(fb && fb->len <= 15 * 1024) {
@@ -166,8 +172,7 @@ void loop() {
     // // Update the last alert time
     // lastAlertTime = millis();
     // Capture 10 images
-    int numCaptured = captureImages(10);
-
+    int numCaptured = captureImages(7);
     if (numCaptured > 0) {
       std::vector<std::pair<const uint8_t*, size_t>> images;
       for (int i = 0; i < numCaptured; i++) {
@@ -179,7 +184,7 @@ void loop() {
     }
   checkTelegramMessages();
   }
-  delay(1000); // Cooldown period
+  delay(500); // Cooldown period
 }
 
 void sendTelegramMessage(const char* message) {
@@ -292,6 +297,9 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
   String closing = "--" + boundary + "--\r\n";
   requestData.insert(requestData.end(), closing.begin(), closing.end());
 
+  // Print free heap memory before sending
+  Serial.println("Free heap before sending: " + String(ESP.getFreeHeap()) + " bytes");
+
   // Send request
   int httpResponseCode = http.POST(&requestData[0], requestData.size());
 
@@ -305,14 +313,14 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
 
   http.end();
 }
-// Capture 10 images in 5-second 
+
+// Capture `numImages` images and store them in buffers
 int captureImages(int numImages) {
   int capturedCount = 0;
 
   for (int i = 0; i < numImages; i++) {
-      // Discard previous frame to avoid duplicates
-      esp_camera_fb_return(esp_camera_fb_get());
-      delay(100);
+      // Delay to allow camera to get a new frame (adjust as needed)
+      delay(500);  
 
       camera_fb_t* fb = esp_camera_fb_get();
       if (!fb) {
@@ -322,19 +330,36 @@ int captureImages(int numImages) {
 
       Serial.println("Captured image " + String(i) + " - Size: " + String(fb->len) + " bytes");
 
-      if (fb->len > 0) {
-          imageBuffers[i] = (uint8_t*)malloc(fb->len);
-          memcpy(imageBuffers[i], fb->buf, fb->len);
-          imageSizes[i] = fb->len;
-          capturedCount++;
+      // Allocate memory and copy image data
+      imageBuffers[i] = (uint8_t*)malloc(fb->len);
+      if (imageBuffers[i] == NULL) {  
+          Serial.println("Memory allocation failed for image " + String(i));
+          esp_camera_fb_return(fb);
+          continue;
       }
 
-      esp_camera_fb_return(fb);
-      delay(500);
+      memcpy(imageBuffers[i], fb->buf, fb->len);
+      imageSizes[i] = fb->len;
+      capturedCount++;
+
+      esp_camera_fb_return(fb);  // Free camera buffer
   }
 
+  Serial.println("Captured " + String(capturedCount) + " images.");
   return capturedCount;
 }
+
+// Free allocated image buffers after sending
+void freeImageBuffers(int numImages) {
+  for (int i = 0; i < numImages; i++) {
+      if (imageBuffers[i] != NULL) {
+          free(imageBuffers[i]);
+          imageBuffers[i] = NULL;
+      }
+  }
+  Serial.println("Freed all image buffers.");
+}
+
 
 void checkTelegramMessages() {
   String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=-1";
