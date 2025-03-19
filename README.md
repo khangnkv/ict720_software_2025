@@ -23,9 +23,22 @@ Waritthorn Na Nagara 6722040281
 
 # Software Models
 1. State Diagram
-2. Sequence Diagram
-3. Overview
-4. Connectivity
-5. Data Modeling
+2. System Architecture
+   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/System%20Architecutre.png)
+    1. Motion, Temperature, and Noise Tracking
+       - M5 Capsule: Attached to the baby crib to collect surround temperature, noise, and motion data.
+       - ESP32 LilyCam: Attached in the room at the angle where the children is visible within the crib
+       - Wi-Fi Transmission: Send all data collected to the server (both local and cloud)
+       - Data Storage and Analysis: Detect irregular movement, surrounding temperature, or noise in the room.
+   2. Remote Monitoring & Manual Control
+       - Cloud Dashboard/App: allow programmers to see admin data in details and summarized infromation for parents
+       - Manual Appliances Control: user can turn on/off camera and devices through app.
+   3. Safety & Energy Efficiency:
+       - Hardware turns off at the scheduled setting (turn off day to conserve energy)
+       - If anything abnormal is detected while baby is monitored, the app will send a Telegram Notificaiton alert along with images/videos recorded after trigger
+3. Sequence Diagram
+4. Overview
+5. Connectivity
+6. Data Modeling
   ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/Baby%20Telegram%20Chatbot.png)
 7. Telegram Bot Alert
