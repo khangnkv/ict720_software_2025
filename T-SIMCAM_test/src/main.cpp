@@ -2,75 +2,31 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include "hw_mic.h"
+#include "config.h"
 #include <esp_camera.h>
 #include <esp_heap_caps.h>
-// Wi-Fi and Telegram credentials
-const char* ssid = "BY_DOM_2.4G";
-const char* password = "0961873889";
-const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
-const char* chatID = "-4646258185";
+
 
 // Microphone and noise detection
 int32_t mic_samples[1600];
-// float avg_val = 0.0;
-const int noiseThreshold = 55; // Noise threshold in dB
 
-unsigned long lastAlertTime = 0; // Track the last alert time
-const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e.g., 60 seconds) 
-
-
-// Set camera pins
-// PIN
-#define SD_MISO_PIN      40
-#define SD_MOSI_PIN      38
-#define SD_SCLK_PIN      39
-#define SD_CS_PIN        47
-#define PCIE_PWR_PIN     48
-#define PCIE_TX_PIN      45
-#define PCIE_RX_PIN      46
-#define PCIE_LED_PIN     21
-#define MIC_IIS_WS_PIN   42
-#define MIC_IIS_SCK_PIN  41
-#define MIC_IIS_DATA_PIN 2
-#define CAM_PWDN_PIN     -1
-#define CAM_RESET_PIN    -1
-#define CAM_XCLK_PIN     14
-#define CAM_SIOD_PIN     4
-#define CAM_SIOC_PIN     5
-#define CAM_Y9_PIN       15
-#define CAM_Y8_PIN       16
-#define CAM_Y7_PIN       17
-#define CAM_Y6_PIN       12
-#define CAM_Y5_PIN       10
-#define CAM_Y4_PIN       8
-#define CAM_Y3_PIN       9
-#define CAM_Y2_PIN       11
-#define CAM_VSYNC_PIN    6
-#define CAM_HREF_PIN     7
-#define CAM_PCLK_PIN     13
-#define BUTTON_PIN       0
-#define PWR_ON_PIN       1
-#define SERIAL_RX_PIN    44
-#define SERIAL_TX_PIN    43
-#define BAT_VOLT_PIN     -1
-
-#define MAX_IMAGES 10
+// Image buffers
 uint8_t* imageBuffers[MAX_IMAGES]; // Array to hold image buffers
 size_t imageSizes[MAX_IMAGES];     // Array to hold image sizes
 
-
+// Function prototypes
 void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
 int captureImages(int numImages);
 void checkTelegramMessages();
 
-
 // Wi-Fi and HTTP clients
 WiFiClient espClient;
 HTTPClient http;
 
 void setup() {
+  // Initialize serial communication
   Serial.begin(115200);
 
   // Connect to Wi-Fi
@@ -119,10 +75,10 @@ void setup() {
   // Camera initialization with resized image
   if (psramFound()) {
     Serial.println("PSRAM found. Using higher resolution and quality settings.");
-    config.frame_size = FRAMESIZE_SVGA; // Use QVGA (320x240) if PSRAM is unavailable
-    config.jpeg_quality = 10;           // Lower quality for smaller file size
-    // config.fb_count = 2;
-    config.fb_count = 1;
+    config.frame_size = FRAMESIZE_SVGA;
+    config.jpeg_quality = 10;           
+    config.fb_count = 2;
+
   } else {
     Serial.println("PSRAM not found. Using lower resolution and quality settings.");
     config.frame_size = FRAMESIZE_QVGA; // Use QVGA (320x240) if PSRAM is unavailable
@@ -172,7 +128,7 @@ void loop() {
     // // Update the last alert time
     // lastAlertTime = millis();
     // Capture 10 images
-    int numCaptured = captureImages(7);
+    int numCaptured = captureImages(MAX_IMAGES);
     if (numCaptured > 0) {
       std::vector<std::pair<const uint8_t*, size_t>> images;
       for (int i = 0; i < numCaptured; i++) {
@@ -257,13 +213,13 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
       return;
   }
 
+  HTTPClient http;
   String boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
   String url = "https://api.telegram.org/bot" + String(botToken) + "/sendMediaGroup";
-
   http.begin(url);
   http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-  // JSON array for media metadata
+  // **Step 1: Create JSON Metadata**
   String mediaJson = "[";
   for (size_t i = 0; i < images.size(); i++) {
       if (i > 0) mediaJson += ",";
@@ -271,41 +227,44 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
   }
   mediaJson += "]";
 
-  // Start multipart body
-  String body = "--" + boundary + "\r\n";
-  body += "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n";
-  body += String(chatID) + "\r\n";
+  // **Step 2: Build Multipart Request Body**
+  String requestData = "--" + boundary + "\r\n";
+  requestData += "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n";
+  requestData += String(chatID) + "\r\n";
 
-  body += "--" + boundary + "\r\n";
-  body += "Content-Disposition: form-data; name=\"media\"\r\n\r\n";
-  body += mediaJson + "\r\n";
+  requestData += "--" + boundary + "\r\n";
+  requestData += "Content-Disposition: form-data; name=\"media\"\r\n\r\n";
+  requestData += mediaJson + "\r\n";
 
-  std::vector<uint8_t> requestData(body.begin(), body.end());
+  // **Convert requestData to byte vector**
+  std::vector<uint8_t> postData(requestData.begin(), requestData.end());
 
-  // Attach images
+  // **Step 3: Attach Images**
   for (size_t i = 0; i < images.size(); i++) {
-      body = "--" + boundary + "\r\n";
-      body += "Content-Disposition: form-data; name=\"photo" + String(i) + "\"; filename=\"photo.jpg\"\r\n";
-      body += "Content-Type: image/jpeg\r\n\r\n";
-      
-      requestData.insert(requestData.end(), body.begin(), body.end());
-      requestData.insert(requestData.end(), images[i].first, images[i].first + images[i].second);
-      requestData.insert(requestData.end(), "\r\n", "\r\n" + 2);
+      String header = "--" + boundary + "\r\n";
+      header += "Content-Disposition: form-data; name=\"photo" + String(i) + "\"; filename=\"photo.jpg\"\r\n";
+      header += "Content-Type: image/jpeg\r\n\r\n";
+
+      // Append header
+      postData.insert(postData.end(), header.begin(), header.end());
+
+      // Append image data
+      postData.insert(postData.end(), images[i].first, images[i].first + images[i].second);
+
+      // Append newline after image
+      postData.insert(postData.end(), "\r\n", "\r\n" + 2);
   }
 
-  // Close the request body
+  // **Step 4: Close the multipart request**
   String closing = "--" + boundary + "--\r\n";
-  requestData.insert(requestData.end(), closing.begin(), closing.end());
+  postData.insert(postData.end(), closing.begin(), closing.end());
 
-  // Print free heap memory before sending
-  Serial.println("Free heap before sending: " + String(ESP.getFreeHeap()) + " bytes");
-
-  // Send request
-  int httpResponseCode = http.POST(&requestData[0], requestData.size());
+  // **Step 5: Send Request**
+  Serial.println("Sending request to Telegram...");
+  int httpResponseCode = http.POST(postData.data(), postData.size());
 
   if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.println("Photo group sent: " + response);
+      Serial.println("Photo group sent: " + http.getString());
   } else {
       Serial.print("Error sending photo group: ");
       Serial.println(httpResponseCode);
@@ -313,6 +272,7 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
 
   http.end();
 }
+
 
 // Capture `numImages` images and store them in buffers
 int captureImages(int numImages) {
