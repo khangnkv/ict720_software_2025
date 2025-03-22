@@ -18,7 +18,7 @@ Waritthorn Na Nagara 6722040281
 1. As a parent, I want to know when my baby needs care at night, but I need rest too, so I want to sleep without worry
 2. As a parent, I want to check my babysitter whether he/she take care of my child properly during my working hours, for I am not available at home, and it is risky if the babysitter does something wrong without notifying
 3. As a parent, I want to review recorded video and audio from the camera to ensure my child was properly cared for throughout the day.
-4. As a babysitter, I want to be alerted if the baby’s room temperature or humidity level becomes uncomfortable so I can adjust the environment for their well-being during my shift.
+4. As a babysitter, I want to be alerted if the baby’s room temperature, noise level, or abnormal motion are happening so I use T-SIMCAM ESP32-S3 for motion detection and using M5StickC for the other abnormalities detection which alert me
 
 
 # Software Models
