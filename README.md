@@ -5,7 +5,7 @@
 ## About the Project
 BabyCare+ is a smart baby monitoring system designed to help parents keep track of their baby's activities and environmental conditions in real time. By integrating IoT devices and a Telegram bot, this system ensures that parents receive immediate notifications when their baby moves or when environmental conditions change. It provides a seamless and efficient way to enhance child safety and comfort.
 
-# Objective
+## Objective
   The objective of this project is to develop a baby monitoring system using the **M5StickC** and **HAT Yun** devices, which detect motion and environmental changes and sends real-time notifications/alerts to parents through a **Telegram bot**.
   The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
   
@@ -16,7 +16,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 - **Image Capture:** Sends an image from the **T-SIMCAM ESP32-S3** when motion, temperature, humidity, air pressure, and noise are detected, giving parents an alert text with information and a visual update of the room’s condition.
 - **Real-time monitor:** Parents could use a specific word to get the current situation of the room by typing in the telegram chat.  ex. "ALERT"
 
-# Members
+## Members
 
 | Name                     | ID          | University |
 |--------------------------|------------|------------|
@@ -25,11 +25,11 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 | Waritthorn Na Nagara    | 6722040281 | SIIT       |
 
 
-# Stakeholder
+## Stakeholder
 1. Parents
 2. Babysitter
 
-# User Stories
+## User Stories
 1. As a parent, I want to know when my baby needs care at night while ensuring I get enough rest, so I want to receive alerts without needing to constantly check.\
 2. As a parent, I want to monitor my babysitter’s performance during working hours to ensure my child is being properly cared for.
 3. As a parent, I want to review recorded video and audio from the camera to verify my child was well cared for throughout the day.
@@ -38,7 +38,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 
 
-# Software Models
+## Software Models
 1. State Diagram
 2. System Architecture
    ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/System%20Architecutre.png)
