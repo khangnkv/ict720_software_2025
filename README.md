@@ -14,7 +14,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 - **Environmental Monitoring:** Provides real-time data on temperature, humidity, and air pressure from the **HAT Yun sensor**.
 - **Noise Detection:** Notifies parents when the noise is too loud or some weird noise from **T-SIMCAM ESP32-S3**.
 - **Image Capture:** Sends an image from the **T-SIMCAM ESP32-S3** when motion, temperature, humidity, air pressure, and noise are detected, giving parents an alert text with information and a visual update of the room’s condition.
-- **Real-time monitor:** Parents could use a specific word to get the current situation of the room ex. "ALERT"
+- **Real-time monitor:** Parents could use a specific word to get the current situation of the room by typing in the telegram chat.  ex. "ALERT"
 
 # Members
 
