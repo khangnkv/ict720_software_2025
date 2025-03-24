@@ -1,9 +1,20 @@
 # ict720_software_2025
 
-# Group BabyCare+
+# Group BabyCare+: Baby 
+
+## About the Project
+BabyCare+ is a smart baby monitoring system designed to help parents keep track of their baby's activities and environmental conditions in real time. By integrating IoT devices and a Telegram bot, this system ensures that parents receive immediate notifications when their baby moves or when environmental conditions change. It provides a seamless and efficient way to enhance child safety and comfort.
 
 # Objective
-  The objective of this project is to develop a baby monitoring system using the M5StickC and HAT Yun device, which detects motion and environmental changes and sends real-time notifications/alerts to parents through a Telegram bot. The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
+  The objective of this project is to develop a baby monitoring system using the **M5StickC** and **HAT Yun** devices, which detect motion and environmental changes and sends real-time notifications/alerts to parents through a **Telegram bot**.
+  The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
+  
+  Key features of the system:
+- **Motion Detection:** Notifies parents when the baby moves or wakes up from tehe **M5StickC**.  
+- **Environmental Monitoring:** Provides real-time data on temperature, humidity, and air pressure from the **HAT Yun sensor**.
+- **Noise Detection:** Notifies parents when the noise is too loud or some weird noise from **T-SIMCAM ESP32-S3**.
+- **Image Capture:** Sends an image from the **T-SIMCAM ESP32-S3** when motion, temperature, humidity, air pressure, and noise are detected, giving parents an alert text with information and a visual update of the room’s condition.
+- **Real-time monitor:** Parents could use a specific word to get the current situation of the room ex. "ALERT"
 
 # Members
 
