@@ -30,7 +30,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 2. Babysitter
 
 ## User Stories
-1. As a parent, I want to know when my baby needs care at night while ensuring I get enough rest, so I want to receive alerts without needing to constantly check.\
+1. As a parent, I want to know when my baby needs care at night while ensuring I get enough rest, so I want to receive alerts without needing to constantly check.
 2. As a parent, I want to monitor my babysitter’s performance during working hours to ensure my child is being properly cared for.
 3. As a parent, I want to review recorded video and audio from the camera to verify my child was well cared for throughout the day.
 4. As a babysitter, I want to be alerted if the baby’s room temperature, noise level, or abnormal motion is detected so I can respond promptly.
