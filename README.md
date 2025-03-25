@@ -49,7 +49,7 @@ T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module
 1. State Diagram
 
 2. System Architecture
-   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/Blank%20board%20-%20Page%201.png)\
+   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/Blank%20board%20-%20Page%201.png)
     1. Motion, Temperature, and Noise Tracking
        - M5StickC: Detects temperature, noise, and motion abnormalities
        - Yun Hat: Assists with environmental sensing
