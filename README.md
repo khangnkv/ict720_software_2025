@@ -39,11 +39,13 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 ## Hardwares
 ![M5 Stick C](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539123663.jpg)\
-M5StickC 2019 Edition\
+**↑M5StickC 2019 Edition↑**
+
 ![YUN HAT](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539212655.jpg)\
-M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)\
+**↑M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)↑**
+
 ![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/images/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
-T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module
+**↑T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module↑**
 
 ## Software Models
 1. State Diagram
