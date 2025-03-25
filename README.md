@@ -71,7 +71,15 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 5. Data Modeling
   ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Baby%20Telegram%20Chatbot.png)
 
-7. Telegram Bot Alert
+7. Telegram Bot Alert\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/ALERT_user_input.jpg" alt="ALERT Test Case" width="420" height="700">\
+   **↑User can type a specific word to get the current image of the baby's room↑**\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/NOISE_detection.jpg" alt="NOISE Test Case" width="420" height="700">\
+   **↑Noise is too loud in the baby's room↑**\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/TEMPERATURE_detection_input.jpg" alt="Temperature Test Case" width="420" height="700">\
+   **↑Temperature is too high in the baby's room↑**\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/HUMIDITY_detection_input.jpg" alt="Humidity Test Case" width="420" height="700">\
+   **↑Humidity is not appropriate in the baby's room↑**
 
-8. Conclusion
+9. Conclusion
 This project aims to enhance the quality of life for parents and babysitter users by integrating temperature, motion, and noise tracking at home. By leveraging IoT devices, the system can provide in-detail analysis that further improving safety, quality of life, and efficiency for every first-time parents.
