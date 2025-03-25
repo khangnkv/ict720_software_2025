@@ -10,8 +10,8 @@ SHT20 sht20;
 Adafruit_BMP280 bmp;
 
 uint32_t update_time = 0;
-const char* ssid = "MOUREE-2.4G";
-const char* password = "ilove@coffee";
+const char* ssid = "BY_DOM_2.4G";
+const char* password = "0961873889";
 const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
 const char* chatID = "-4646258185";
 float accX, accY, accZ;

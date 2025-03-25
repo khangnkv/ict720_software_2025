@@ -3,9 +3,11 @@ const char* ssid = "BY_DOM_2.4G";
 const char* password = "0961873889";
 
 //set the token and chat id of the telegram bot
-const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
-const char* chatID = "-4646258185";
-
+// const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
+// const char* chatID = "-4646258185";
+const char* botToken = "8014819411:AAGoPCj--tjormpguatqeDhNwC6NwwU4ikM";
+const char* chatID = "5854488746";
+#define baud_rate 115200
 
 // Set camera pins
 #define SD_MISO_PIN      40
@@ -41,8 +43,11 @@ const char* chatID = "-4646258185";
 #define SERIAL_TX_PIN    43
 #define BAT_VOLT_PIN     -1
 
-// Set the noise threshold in dB
+// Set the noise threshold in dB 
+#define MIC_SAMPLE_COUNT 1600
+#define MIC_SAMPLE_RATE 16000
 const int noiseThreshold = 50; // Noise threshold in dB
+
 
 // Set the alert cooldown period in milliseconds
 unsigned long lastAlertTime = 0; // Track the last alert time
@@ -50,3 +55,6 @@ const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e
 
 // Define the maximum number of images to capture
 #define MAX_IMAGES 10
+
+//loop delay
+int loopDelay = 500;
