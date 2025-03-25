@@ -38,18 +38,18 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 
 ## Hardwares
-![M5 Stick C](https://github.com/khangnkv/ict720_software_2025/blob/main/messageImage_1742539123663.jpg)\
+![M5 Stick C](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539123663.jpg)\
 M5StickC 2019 Edition\
-![YUN HAT](https://github.com/khangnkv/ict720_software_2025/blob/main/messageImage_1742539212655.jpg)\
+![YUN HAT](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539212655.jpg)\
 M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)\
-![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
+![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/images/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
 T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module
 
 ## Software Models
 1. State Diagram
 
 2. System Architecture
-   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/Blank%20board%20-%20Page%201.png)
+   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Blank%20board%20-%20Page%201.png)
     1. Motion, Temperature, and Noise Tracking
        - M5StickC: Detects temperature, noise, and motion abnormalities
        - Yun Hat: Assists with environmental sensing
@@ -67,7 +67,7 @@ T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module
 4. Data Flow Process
 
 5. Data Modeling
-  ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/Baby%20Telegram%20Chatbot.png)
+  ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Baby%20Telegram%20Chatbot.png)
 
 7. Telegram Bot Alert
 
