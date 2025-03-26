@@ -7,6 +7,8 @@ const char* password = "0961873889";
 // const char* chatID = "-4646258185";
 const char* botToken = "8014819411:AAGoPCj--tjormpguatqeDhNwC6NwwU4ikM";
 const char* chatID = "5854488746";
+
+// Set the baud rate for serial communication
 #define baud_rate 115200
 
 // Set camera pins
@@ -58,3 +60,14 @@ const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e
 
 //loop delay
 int loopDelay = 500;
+
+//Image capture delay
+int imageCaptureDelay = 500;
+
+//Alert keywords to check for
+const char* alertKeywords[] = {
+    "\\ud83d\\udd25 Temperature too high! Over 32\\u00b0C!",
+    "\\ud83d\\udca7 Humidity too low! Below 70%!",
+    "\\ud83c\\udf2a Pressure too high! Over 1000 hPa!",
+    "\\u26a0\\ufe0f Sudden movement detected!"
+  };

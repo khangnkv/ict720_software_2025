@@ -14,12 +14,15 @@ unsigned int num_samples = MIC_SAMPLE_COUNT;
 uint8_t* imageBuffers[MAX_IMAGES]; // Array to hold image buffers
 size_t imageSizes[MAX_IMAGES];     // Array to hold image sizes
 
-// Function prototypes
+// Function
 void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
 int captureImages(int numImages);
-void checkTelegramMessages();
+void flushCameraBuffer();
+void freeImageBuffers(int numImages);
+void checkTelegramCommand();
+void checkTelegramAlert();
 float calculateNoiseLevel(int32_t* samples, unsigned int num_samples);
 void sendNoiseAlert(float noiseLevel_dB);
 
@@ -103,6 +106,11 @@ void setup() {
   } else {
     Serial.println("Camera initialized successfully");
   }
+
+  //notify in chat tha baby monitor is started
+  sendTelegramMessage("ESP32 Baby Monitor started successfully ( ˶ˆᗜˆ˵ )");
+  sendTelegramMessage("Type /help to see available commands.");
+
 }
 
 void loop() {
@@ -123,7 +131,10 @@ void loop() {
   }
 
   // Check for messages from Telegram
-  checkTelegramMessages();
+  checkTelegramCommand();
+
+  // Check for alert keywords in messages
+  checkTelegramAlert();
 
   delay(loopDelay); // Cooldown period
 }
@@ -209,11 +220,6 @@ void sendTelegramPhoto(const uint8_t* buffer, size_t length) {
 
 }
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images) {
-  if (WiFi.status() != WL_CONNECTED) {
-      Serial.println("Wi-Fi not connected!");
-      return;
-  }
-
   HTTPClient http;
   String boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
   String url = "https://api.telegram.org/bot" + String(botToken) + "/sendMediaGroup";
@@ -278,10 +284,14 @@ void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> im
 // Capture `numImages` images and store them in buffers
 int captureImages(int numImages) {
   int capturedCount = 0;
-
+  sendTelegramMessage("Capturing images, please wait...");
+  
+  // Flush camera buffer first to get fresh images
+  flushCameraBuffer();
+  
   for (int i = 0; i < numImages; i++) {
-      // Delay to allow camera to get a new frame (adjust as needed)
-      delay(500);  
+      // Delay to allow camera to get a new frame
+      delay(imageCaptureDelay);  
 
       camera_fb_t* fb = esp_camera_fb_get();
       if (!fb) {
@@ -310,6 +320,18 @@ int captureImages(int numImages) {
   return capturedCount;
 }
 
+void flushCameraBuffer() {
+  // Take and discard a few frames to clear any stale images
+  Serial.println("Flushing camera buffer...");
+  for (int i = 0; i < 3; i++) {
+    camera_fb_t* fb = esp_camera_fb_get();
+    if (fb) {
+      esp_camera_fb_return(fb);
+    }
+    delay(100); // Small delay between frames
+  }
+}
+
 // Free allocated image buffers after sending
 void freeImageBuffers(int numImages) {
   for (int i = 0; i < numImages; i++) {
@@ -321,7 +343,7 @@ void freeImageBuffers(int numImages) {
   Serial.println("Freed all image buffers.");
 }
 
-void checkTelegramMessages() {
+void checkTelegramCommand() {
   // Use offset to only get new messages (offset = lastUpdateId + 1)
   String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=" + String(lastUpdateId + 1);
   http.begin(url);
@@ -384,27 +406,17 @@ void checkTelegramMessages() {
                                         return;
                                     }
                                 }
-                                
-                                // Regular alert command (existing functionality)
-                                Serial.println("🚨 ALERT command received! Capturing images...");
-                                int numCaptured = captureImages(MAX_IMAGES);
-                                if (numCaptured > 0) {
-                                    std::vector<std::pair<const uint8_t*, size_t>> images;
-                                    for (int i = 0; i < numCaptured; i++) {
-                                        images.push_back({imageBuffers[i], imageSizes[i]});
-                                    }
-                                    
-                                    sendTelegramPhotosAsGroup(images);
-                                    
-                                    // Free memory after sending
-                                    freeImageBuffers(numCaptured);
-                                } else {
-                                    Serial.println("❌ No images captured.");
-                                    sendTelegramMessage("Sorry, failed to capture images");
-                                }
                              } 
-                             else if (command == "photo" || command == "picture") {
+                             else if (command == "photo") {
                                   Serial.println("Capturing single image...");
+                                  sendTelegramMessage("Capturing image...");
+                                   // Flush the camera buffer first to get a fresh image
+                                  flushCameraBuffer();
+                                  
+                                  // Add a small delay for sensor to adjust
+                                  delay(300);
+                                  
+                                  // Now capture the real photo
                                   camera_fb_t* fb = esp_camera_fb_get();
                                   if (!fb) {
                                       Serial.println("Failed to capture image");
@@ -415,7 +427,7 @@ void checkTelegramMessages() {
                                       esp_camera_fb_return(fb);  // Free camera buffer
                                   }
                               }
-                              else if (command == "photos" || command == "pictures") {
+                              else if (command == "photos") {
                                   Serial.println("Capturing multiple images...");
                                   int numCaptured = captureImages(MAX_IMAGES);
                                   if (numCaptured > 0) {
@@ -429,11 +441,11 @@ void checkTelegramMessages() {
                                       // Free memory after sending
                                       freeImageBuffers(numCaptured);
                                   } else {
-                                      Serial.println("❌ No images captured.");
-                                      sendTelegramMessage("Sorry, failed to capture images");
+                                      Serial.println("No images captured.");
+                                      sendTelegramMessage("❌ Sorry, failed to capture images");
                                   }
                               }
-                              else if (command == "noise" || command == "sound") {
+                              else if (command == "noise") {
                                   num_samples = MIC_SAMPLE_COUNT;
                                   hw_mic_read(mic_samples, &num_samples);
                                   float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
@@ -444,7 +456,6 @@ void checkTelegramMessages() {
                                   String helpMsg = "Available commands:\n";
                                   helpMsg += "/photo - Take a single photo\n";
                                   helpMsg += "/photos - Take multiple photos\n";
-                                  helpMsg += "/alert - Trigger alert mode\n";
                                   helpMsg += "/alert cooldown on - Enable alert cooldown\n";
                                   helpMsg += "/alert cooldown off - Disable alert cooldown\n";
                                   helpMsg += "/alert cooldown status - Check cooldown status\n";
@@ -469,6 +480,105 @@ void checkTelegramMessages() {
   http.end();
 }
 
+// Check for alert keywords in Telegram messages
+void checkTelegramAlert() {
+  // Use offset to only get new messages (offset = lastUpdateId + 1)
+  // Get updates from Telegram
+  String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=" + String(lastUpdateId + 1);
+  http.begin(url);
+  
+  int httpResponseCode = http.GET();
+
+  if (httpResponseCode > 0) {
+      String response = http.getString();
+      
+      // Check if there are any updates in the response
+      if (response.indexOf("\"ok\":true") != -1 && response.indexOf("\"result\":[{") != -1) {
+          // Extract update_id
+          int updateIdPos = response.indexOf("\"update_id\":");
+          if (updateIdPos != -1) {
+              updateIdPos += 12; // Length of "update_id":
+              int updateIdEnd = response.indexOf(",", updateIdPos);
+              if (updateIdEnd != -1) {
+                  // Get current update ID
+                  String updateIdStr = response.substring(updateIdPos, updateIdEnd);
+                  long currentUpdateId = updateIdStr.toInt();
+                  
+                  // Extract message text
+                  int textPos = response.indexOf("\"text\":\"");
+                  if (textPos != -1) {
+                      textPos += 8; // Length of "text":"
+                      int textEnd = response.indexOf("\"", textPos);
+                      if (textEnd != -1) {
+                        String messageText = response.substring(textPos, textEnd);
+                        // Add debug info
+                        Serial.println("Raw message: " + messageText);
+                        Serial.print("Message bytes: ");
+                        for (int i = 0; i < messageText.length() && i < 20; i++) {
+                          Serial.print(String((byte)messageText.charAt(i), HEX) + " ");
+                        }
+                        Serial.println();
+                        
+                        // Skip if it's a command (starts with /)
+                        if (messageText.length() > 0 && messageText.charAt(0) == '/') {
+                            // Let checkTelegramCommand handle this message
+                            http.end();
+                            return;
+                        }
+                    
+                        const int numAlertKeywords = sizeof(alertKeywords) / sizeof(alertKeywords[0]);
+                        // Check for any alert keyword
+                        bool foundAlertKeyword = false;
+                        for (int i = 0; i < numAlertKeywords; i++) {
+                            // Debug output to see what we're checking for
+                            Serial.println("Checking for keyword: \"" + String(alertKeywords[i]) + "\"");
+                            if (messageText.indexOf(alertKeywords[i]) != -1) {
+                                foundAlertKeyword = true;
+                                Serial.println("Alert keyword found: " + String(alertKeywords[i]));
+                                break;
+                            }
+                        }
+                        
+                        // Update last processed ID (only if not a command)
+                        lastUpdateId = currentUpdateId;
+                        
+                        // If alert keyword found, send alert response
+                        if (foundAlertKeyword) {
+                            Serial.println("Alert  detected! Capturing images...");
+                              sendTelegramMessage("🚨Alert detected! Checking baby's room...");
+                              
+                              // Capture images and send them
+                              int numCaptured = captureImages(MAX_IMAGES);
+                              if (numCaptured > 0) {
+                                  std::vector<std::pair<const uint8_t*, size_t>> images;
+                                  for (int i = 0; i < numCaptured; i++) {
+                                      images.push_back({imageBuffers[i], imageSizes[i]});
+                                  }
+                                  
+                                  sendTelegramPhotosAsGroup(images);
+                                  
+                                  // Check noise level
+                                  num_samples = MIC_SAMPLE_COUNT;
+                                  hw_mic_read(mic_samples, &num_samples);
+                                  float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
+                                  sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
+                                  
+                                  // Free memory after sending
+                                  freeImageBuffers(numCaptured);
+                              } else {
+                                  Serial.println("No images captured.");
+                                  sendTelegramMessage("❌ Sorry, failed to capture images");
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  http.end();
+}
+
 // Send alert with noise level and capture/send images
 void sendNoiseAlert(float noiseLevel_dB) {
   sendTelegramMessage("🚨 Noise detected in baby's room! 🚨");
@@ -484,9 +594,9 @@ void sendNoiseAlert(float noiseLevel_dB) {
     }
     sendTelegramPhotosAsGroup(images);
     
-    // Free memory after sending
-    freeImageBuffers(MAX_IMAGES);
+    // Free memory after sending - FIXED: Only free what was captured
+    freeImageBuffers(numCaptured);
   } else {
-    Serial.println("❌ No images captured.");
+    Serial.println("No images captured.");
   }
 }
