@@ -1,0 +1,59 @@
+services:
+    mqtt_app:
+        build: ./mqtt_app
+        env_file:
+            - .env
+        depends_on:
+            - mosquitto
+            - mongo    
+    mosquitto:
+        image: eclipse-mosquitto
+        ports:
+            - "1883:1883"
+        volumes:
+            - ./mosquitto/config:/mosquitto/config
+            - ./mosquitto/data:/mosquitto/data
+            - ./mosquitto/log:/mosquitto/log
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./mongo/data:/data/db
+            - ./mongo/init:/docker-entrypoint-initdb.d
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
+          MONGO_INITDB_DATABASE: _db
+      # Mongo Express
+    mongo-express:
+        image: mongo-express
+        ports:
+        - "8081:8081" # localhost:8081 to access mongo-express
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: example
+            ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+            ME_CONFIG_BASICAUTH: false
+            TZ: "Asia/Bangkok"
+        depends_on:
+            - mongo
+    node-red:
+        build:
+          context: ./node-red
+          dockerfile: Dockerfile
+        restart: unless-stopped
+        depends_on:
+         - mongo
+         - mosquitto  
+        ports:
+         - "1880:1880"
+        environment:
+            - MONGO_URI=mongodb://mongo:27017/babymonitor
+            - MQTT_BROKER=mosquitto
+            - MQTT_PORT=1883
+            - MQTT_TOPIC=ict720/babyMonitor/
+        volumes:
+         - node_red_data:/data
+volumes:
+    node_red_data:

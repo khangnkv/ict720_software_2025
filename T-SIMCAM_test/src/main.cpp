@@ -1,10 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClient.h>
 #include <HTTPClient.h>
 #include "hw_mic.h"
 #include "config.h"
 #include <esp_camera.h>
 #include <esp_heap_caps.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 // Microphone and noise detection
 int32_t mic_samples[MIC_SAMPLE_COUNT];
@@ -14,7 +17,7 @@ unsigned int num_samples = MIC_SAMPLE_COUNT;
 uint8_t* imageBuffers[MAX_IMAGES]; // Array to hold image buffers
 size_t imageSizes[MAX_IMAGES];     // Array to hold image sizes
 
-// Function
+// Function declarations
 void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
@@ -22,19 +25,34 @@ int captureImages(int numImages);
 void flushCameraBuffer();
 void freeImageBuffers(int numImages);
 void checkTelegramCommand();
-void checkTelegramAlert();
+// void checkTelegramAlert();
 float calculateNoiseLevel(int32_t* samples, unsigned int num_samples);
 void sendNoiseAlert(float noiseLevel_dB);
+void mqttSendNoiseData(float noiseLevel_dB);
+void mqttSendAlertCount();
+void mqttCallback(char* topic, byte* payload, unsigned int length);
+bool checkMqttConnection();
+bool reconnectMQTT();
 
 // Wi-Fi and HTTP clients
 WiFiClient espClient;
 HTTPClient http;
+
+//Mqtt client
+PubSubClient mqttClient(espClient);
+JsonDocument doc;
 
 // Store last processed update ID
 long lastUpdateId = 0; 
 
 // Alert cooldown state
 bool alertCooldownEnabled = true; 
+unsigned int noiseAlertCount = 0;
+
+//mqtt variables
+char payload[256]; // Buffer for MQTT payload
+unsigned long lastMqttReconnectAttempt = 0;
+const unsigned long mqttReconnectInterval = 5000;// Reconnect interval in milliseconds
 
 void setup() {
   // Initialize serial communication
@@ -57,6 +75,12 @@ void setup() {
     Serial.println("\nFailed to connect to Wi-Fi");
     return;
   }
+
+  //connect to MQTT broker
+  mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
+  mqttClient.connect(MQTT_CLIENT_ID);
+  mqttClient.setCallback(mqttCallback);
+  Serial.println("Connected to MQTT broker");
 
   // Initialize microphone
   hw_mic_init(MIC_SAMPLE_RATE);
@@ -120,6 +144,13 @@ void loop() {
   // Calculate and display noise level
   float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
   Serial.printf("Noise level: %.2f dB\n", noiseLevel_dB);
+  mqttSendNoiseData(noiseLevel_dB);
+
+  if (!mqttClient.connected()) {
+    reconnectMQTT();
+  }
+  mqttClient.loop();
+
 
   // Send alert if noise exceeds threshold
   if (noiseLevel_dB > noiseThreshold) {
@@ -134,7 +165,7 @@ void loop() {
   checkTelegramCommand();
 
   // Check for alert keywords in messages
-  checkTelegramAlert();
+  // checkTelegramAlert();
 
   delay(loopDelay); // Cooldown period
 }
@@ -453,18 +484,19 @@ void checkTelegramCommand() {
                               }
                               else if (command == "help") {
                                   // Send help message with available commands
-                                  String helpMsg = "Available commands:\n";
+                                  String helpMsg = "ESP32 Available commands:\n";
                                   helpMsg += "/photo - Take a single photo\n";
                                   helpMsg += "/photos - Take multiple photos\n";
                                   helpMsg += "/alert cooldown on - Enable alert cooldown\n";
                                   helpMsg += "/alert cooldown off - Disable alert cooldown\n";
                                   helpMsg += "/alert cooldown status - Check cooldown status\n";
                                   helpMsg += "/noise - Check current noise level\n";
+                                  helpMsg += "/status - Check current environment status(Requieres M5&Yunhat)\n";
                                   helpMsg += "/help - Show this help message";
                                   sendTelegramMessage(helpMsg.c_str());
                               }
                               else {
-                                  sendTelegramMessage("Unknown command. Type /help for available commands.");
+                                  sendTelegramMessage("Invalid command. Type /help to see available commands.");
                               }
                           }
                       }
@@ -480,111 +512,111 @@ void checkTelegramCommand() {
   http.end();
 }
 
-// Check for alert keywords in Telegram messages
-void checkTelegramAlert() {
-  // Use offset to only get new messages (offset = lastUpdateId + 1)
-  // Get updates from Telegram
-  String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=" + String(lastUpdateId + 1);
-  http.begin(url);
+// // Check for alert keywords in Telegram messages
+// void checkTelegramAlert() {
+//   // Get updates from Telegram
+//   String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=" + String(lastUpdateId + 1);
+//   http.begin(url);
   
-  int httpResponseCode = http.GET();
+//   int httpResponseCode = http.GET();
 
-  if (httpResponseCode > 0) {
-      String response = http.getString();
+//   if (httpResponseCode > 0) {
+//       String response = http.getString();
       
-      // Check if there are any updates in the response
-      if (response.indexOf("\"ok\":true") != -1 && response.indexOf("\"result\":[{") != -1) {
-          // Extract update_id
-          int updateIdPos = response.indexOf("\"update_id\":");
-          if (updateIdPos != -1) {
-              updateIdPos += 12; // Length of "update_id":
-              int updateIdEnd = response.indexOf(",", updateIdPos);
-              if (updateIdEnd != -1) {
-                  // Get current update ID
-                  String updateIdStr = response.substring(updateIdPos, updateIdEnd);
-                  long currentUpdateId = updateIdStr.toInt();
+//       // Check if there are any updates in the response
+//       if (response.indexOf("\"ok\":true") != -1 && response.indexOf("\"result\":[{") != -1) {
+//           // Extract update_id
+//           int updateIdPos = response.indexOf("\"update_id\":");
+//           if (updateIdPos != -1) {
+//               updateIdPos += 12; // Length of "update_id":
+//               int updateIdEnd = response.indexOf(",", updateIdPos);
+//               if (updateIdEnd != -1) {
+//                   // Get current update ID
+//                   String updateIdStr = response.substring(updateIdPos, updateIdEnd);
+//                   long currentUpdateId = updateIdStr.toInt();
                   
-                  // Extract message text
-                  int textPos = response.indexOf("\"text\":\"");
-                  if (textPos != -1) {
-                      textPos += 8; // Length of "text":"
-                      int textEnd = response.indexOf("\"", textPos);
-                      if (textEnd != -1) {
-                        String messageText = response.substring(textPos, textEnd);
-                        // Add debug info
-                        Serial.println("Raw message: " + messageText);
-                        Serial.print("Message bytes: ");
-                        for (int i = 0; i < messageText.length() && i < 20; i++) {
-                          Serial.print(String((byte)messageText.charAt(i), HEX) + " ");
-                        }
-                        Serial.println();
+//                   // Extract message text
+//                   int textPos = response.indexOf("\"text\":\"");
+//                   if (textPos != -1) {
+//                       textPos += 8; // Length of "text":"
+//                       int textEnd = response.indexOf("\"", textPos);
+//                       if (textEnd != -1) {
+//                         String messageText = response.substring(textPos, textEnd);
+//                         // Add debug info
+//                         Serial.println("Raw message: " + messageText);
+//                         Serial.print("Message bytes: ");
+//                         for (int i = 0; i < messageText.length() && i < 20; i++) {
+//                           Serial.print(String((byte)messageText.charAt(i), HEX) + " ");
+//                         }
+//                         Serial.println();
                         
-                        // Skip if it's a command (starts with /)
-                        if (messageText.length() > 0 && messageText.charAt(0) == '/') {
-                            // Let checkTelegramCommand handle this message
-                            http.end();
-                            return;
-                        }
+//                         // Skip if it's a command (starts with /)
+//                         if (messageText.length() > 0 && messageText.charAt(0) == '/') {
+//                             // Let checkTelegramCommand handle this message
+//                             http.end();
+//                             return;
+//                         }
                     
-                        const int numAlertKeywords = sizeof(alertKeywords) / sizeof(alertKeywords[0]);
-                        // Check for any alert keyword
-                        bool foundAlertKeyword = false;
-                        for (int i = 0; i < numAlertKeywords; i++) {
-                            // Debug output to see what we're checking for
-                            Serial.println("Checking for keyword: \"" + String(alertKeywords[i]) + "\"");
-                            if (messageText.indexOf(alertKeywords[i]) != -1) {
-                                foundAlertKeyword = true;
-                                Serial.println("Alert keyword found: " + String(alertKeywords[i]));
-                                break;
-                            }
-                        }
+//                         const int numAlertKeywords = sizeof(alertKeywords) / sizeof(alertKeywords[0]);
+//                         // Check for any alert keyword
+//                         bool foundAlertKeyword = false;
+//                         for (int i = 0; i < numAlertKeywords; i++) {
+//                             // Debug output to see what we're checking for
+//                             Serial.println("Checking for keyword: \"" + String(alertKeywords[i]) + "\"");
+//                             if (messageText.indexOf(alertKeywords[i]) != -1) {
+//                                 foundAlertKeyword = true;
+//                                 Serial.println("Alert keyword found: " + String(alertKeywords[i]));
+//                                 break;
+//                             }
+//                         }
+                      
+//                         // Update last processed ID (only if not a command)
+//                         lastUpdateId = currentUpdateId;
                         
-                        // Update last processed ID (only if not a command)
-                        lastUpdateId = currentUpdateId;
-                        
-                        // If alert keyword found, send alert response
-                        if (foundAlertKeyword) {
-                            Serial.println("Alert  detected! Capturing images...");
-                              sendTelegramMessage("🚨Alert detected! Checking baby's room...");
+//                         // If alert keyword found, send alert response
+//                         if (foundAlertKeyword) {
+//                             Serial.println("Alert  detected! Capturing images...");
+//                               sendTelegramMessage("🚨Alert detected! Checking baby's room...");
                               
-                              // Capture images and send them
-                              int numCaptured = captureImages(MAX_IMAGES);
-                              if (numCaptured > 0) {
-                                  std::vector<std::pair<const uint8_t*, size_t>> images;
-                                  for (int i = 0; i < numCaptured; i++) {
-                                      images.push_back({imageBuffers[i], imageSizes[i]});
-                                  }
+//                               // Capture images and send them
+//                               int numCaptured = captureImages(MAX_IMAGES);
+//                               if (numCaptured > 0) {
+//                                   std::vector<std::pair<const uint8_t*, size_t>> images;
+//                                   for (int i = 0; i < numCaptured; i++) {
+//                                       images.push_back({imageBuffers[i], imageSizes[i]});
+//                                   }
                                   
-                                  sendTelegramPhotosAsGroup(images);
+//                                   sendTelegramPhotosAsGroup(images);
                                   
-                                  // Check noise level
-                                  num_samples = MIC_SAMPLE_COUNT;
-                                  hw_mic_read(mic_samples, &num_samples);
-                                  float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
-                                  sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
+//                                   // Check noise level
+//                                   num_samples = MIC_SAMPLE_COUNT;
+//                                   hw_mic_read(mic_samples, &num_samples);
+//                                   float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
+//                                   sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
                                   
-                                  // Free memory after sending
-                                  freeImageBuffers(numCaptured);
-                              } else {
-                                  Serial.println("No images captured.");
-                                  sendTelegramMessage("❌ Sorry, failed to capture images");
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-      }
-  }
-  http.end();
-}
+//                                   // Free memory after sending
+//                                   freeImageBuffers(numCaptured);
+//                               } else {
+//                                   Serial.println("No images captured.");
+//                                   sendTelegramMessage("❌ Sorry, failed to capture images");
+//                               }
+//                           }
+//                       }
+//                   }
+//               }
+//           }
+//       }
+//   }
+//   http.end();
+// }
 
 // Send alert with noise level and capture/send images
 void sendNoiseAlert(float noiseLevel_dB) {
   sendTelegramMessage("🚨 Noise detected in baby's room! 🚨");
   sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
   lastAlertTime = millis();
-
+  // Increment alert count
+  
   // Capture 10 images
   int numCaptured = captureImages(MAX_IMAGES);
   if (numCaptured > 0) {
@@ -596,7 +628,148 @@ void sendNoiseAlert(float noiseLevel_dB) {
     
     // Free memory after sending - FIXED: Only free what was captured
     freeImageBuffers(numCaptured);
+
+    // Increment alert count
+    noiseAlertCount++;
+    mqttSendAlertCount();
+
   } else {
     Serial.println("No images captured.");
+  }
+}
+
+
+void mqttSendNoiseData(float noiseLevel_dB) {
+  if (!checkMqttConnection()) {
+    return; // Exit if not connected
+  }
+
+  // Clear document and prepare payload
+  doc.clear();
+  doc["timestamp"] = millis();
+  doc["noise"] = noiseLevel_dB;
+  
+  // Serialize to JSON and publish
+  serializeJson(doc, payload);
+  bool published = mqttClient.publish(MQTT_TOPIC_NOISE, payload);
+  
+  if (published) {
+    Serial.println("MQTT noise data published successfully");
+  } else {
+    Serial.println("Failed to publish MQTT noise data");
+  }
+  // Process any incoming messages
+  mqttClient.loop();
+}
+
+void mqttSendAlertCount() {
+  if (!checkMqttConnection()) {
+    return; // Exit if not connected
+  }
+
+  // Clear document and prepare payload
+  doc.clear();
+  doc["timestamp"] = millis();
+  doc["alert_count"] = noiseAlertCount;
+  
+  // Serialize to JSON and publish
+  serializeJson(doc, payload);
+  bool published = mqttClient.publish(MQTT_TOPIC_ALERT, payload);
+  
+  if (published) {
+    Serial.println("MQTT alert count published successfully");
+  } else {
+    Serial.println("Failed to publish MQTT alert count");
+  }
+  
+  // Process any incoming messages
+  mqttClient.loop();
+}
+
+bool checkMqttConnection() {
+  if (!mqttClient.connected()) {
+    // Only try to reconnect at certain intervals to avoid blocking
+    if (millis() - lastMqttReconnectAttempt > mqttReconnectInterval) {
+      lastMqttReconnectAttempt = millis();
+      if (!reconnectMQTT()) {
+        Serial.println("MQTT connection failed, will retry later");
+        return false;
+      }
+    } else {
+      return false; // Skip this attempt if we're waiting for reconnect interval
+    }
+  }
+  return true;
+}
+
+// Attempt to reconnect to the MQTT broker
+bool reconnectMQTT() {
+  if (!mqttClient.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    
+    // Create a random client ID
+    String clientId = MQTT_CLIENT_ID;
+    clientId += String(random(0xffff), HEX);
+    
+    // Attempt to connect
+    if (mqttClient.connect(clientId.c_str())) {
+      Serial.println("connected");
+      
+      // Subscribe to alert flag topic
+      mqttClient.subscribe(MQTT_TOPIC_ALERT_FLAG);
+      Serial.print("Subscribed to topic: ");
+      Serial.println(MQTT_TOPIC_ALERT_FLAG);
+      
+      return true;
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqttClient.state());
+      Serial.println(" try again in 5 seconds");
+      return false;
+    }
+  }
+  return true;
+}
+
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.println(topic);
+  
+  // Create a null-terminated string from the payload
+  char message[length + 1];
+  memcpy(message, payload, length);
+  message[length] = '\0';
+  
+  Serial.print("Message: ");
+  Serial.println(message);
+  
+  // Check if this is an alert flag
+  if (strcmp(topic, MQTT_TOPIC_ALERT_FLAG) == 0) {
+    // Alert flag received - trigger camera and alert
+    if (!alertCooldownEnabled || millis() - lastAlertTime > alertCooldown) {
+      // Alert flag received - trigger camera and alert
+      Serial.println("Alert flag received! Taking pictures and sending alert...");
+
+      // Send message via Telegram
+      sendTelegramMessage("🚨 Alert received from another device! 🚨");
+      
+      // Take some pictures
+      int numCaptured = captureImages(MAX_IMAGES);
+      
+      // Send images if available
+      if (numCaptured > 0) {
+        std::vector<std::pair<const uint8_t*, size_t>> images;
+        for (int i = 0; i < numCaptured; i++) {
+          images.push_back({imageBuffers[i], imageSizes[i]});
+        }
+        sendTelegramPhotosAsGroup(images);
+        
+        // Free memory after sending
+        freeImageBuffers(numCaptured);
+      }
+      
+      // Update last alert time
+      lastAlertTime = millis();
+    }
   }
 }

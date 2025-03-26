@@ -8,6 +8,14 @@ const char* password = "0961873889";
 const char* botToken = "8014819411:AAGoPCj--tjormpguatqeDhNwC6NwwU4ikM";
 const char* chatID = "5854488746";
 
+// Mqtt settings
+#define MQTT_BROKER       "192.168.1.26"
+#define MQTT_PORT         1883
+#define MQTT_CLIENT_ID    "babyMonitor_Tsimcam"
+#define MQTT_TOPIC_ALERT  "ict720/babyMonitor/alertcount"
+#define MQTT_TOPIC_NOISE  "ict720/babyMonitor/noise"
+#define MQTT_TOPIC_ALERT_FLAG "ict720/babyMonitor/alertflag"
+
 // Set the baud rate for serial communication
 #define baud_rate 115200
 
@@ -65,9 +73,10 @@ int loopDelay = 500;
 int imageCaptureDelay = 500;
 
 //Alert keywords to check for
-const char* alertKeywords[] = {
-    "\\ud83d\\udd25 Temperature too high! Over 32\\u00b0C!",
-    "\\ud83d\\udca7 Humidity too low! Below 70%!",
-    "\\ud83c\\udf2a Pressure too high! Over 1000 hPa!",
-    "\\u26a0\\ufe0f Sudden movement detected!"
-  };
+// const char* alertKeywords[] = {
+//   "🔥 Temperature too high! Over 32°C!",
+//     "\\ud83d\\udd25 Temperature too high! Over 32\\u00b0C!",
+//     "\\ud83d\\udca7 Humidity too low! Below 70%!",
+//     "\\ud83c\\udf2a Pressure too high! Over 1000 hPa!",
+//     "\\u26a0\\ufe0f Sudden movement detected!"
+//   };
