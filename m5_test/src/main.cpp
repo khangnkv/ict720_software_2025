@@ -33,6 +33,14 @@ uint8_t brightness = yunBrightness;
 // Telegram tracking
 long lastProcessedUpdateId = 0;
 
+//track alert count
+unsigned int alertCount = 0;
+
+bool pendingStatusRequest = false;
+unsigned long lastTelegramCheck = 0;
+const unsigned long telegramCheckInterval = 2000; // Check telegram every 2 seconds
+
+
 // Function declarations
 void setupWiFi();
 void setupSensors();
@@ -45,6 +53,7 @@ bool reconnectMQTT();
 bool checkMqttConnection();
 void mqttSendSensorData();
 void mqttSendAlertFlag();
+void mqttSendAlertFlagCount();
 
 void setup() {
     Serial.begin(baud_rate);
@@ -71,13 +80,19 @@ void setup() {
         Serial.println("Connected to MQTT broker");
     }
 
-    sendTelegramMessage("M5StickC&YunHat started successfully (˶ᐢ ᵕ ᐢ˶)");
+    sendTelegramMessage("M5StickC&YunHat BabyCare+ ready to monitor your baby's room! (˶ᐢ ᵕ ᐢ˶)");
 }
 
 void loop() {
     // Update LED
     led_set_all((brightness << 16) | (brightness << 8) | brightness);
-    
+
+    // Check for Telegram messages at regular intervals
+    if (millis() - lastTelegramCheck > telegramCheckInterval) {
+        checkTelegramMessages();
+        lastTelegramCheck = millis();
+    }
+
     // Ensure MQTT connection
     if (!mqttClient.connected()) {
         reconnectMQTT();
@@ -93,17 +108,20 @@ void loop() {
         // Set next update time based on sleepTime from config
         nextUpdateTime = millis() + (sleepTime * 1000);
     }
-    
-    // Check for Telegram messages
-    checkTelegramMessages();
+
+     // Process any pending commands - do this in a less busy moment
+     if (pendingStatusRequest) {
+        sendStatusUpdate();
+        pendingStatusRequest = false;
+    }
 
     // Check for button press
     M5.update();
     if (M5.BtnA.wasPressed()) {
         esp_restart();
     }
-    
-    delay(1000);
+
+    delay(500);
 }
 
 void setupWiFi() {
@@ -138,40 +156,65 @@ void setupSensors() {
 }
 
 void readSensors() {
-    tmp = sht20.read_temperature();
-    hum = sht20.read_humidity();
-    light = light_get();
-    pressure = bmp.readPressure();
-    M5.IMU.getAccelData(&accX, &accY, &accZ);
-    M5.IMU.getGyroData(&gyroX, &gyroY, &gyroZ);
-    
-    Serial.printf("AX:%.2f,AY:%.2f,AZ:%.2f,GX:%.2f,GY:%.2f,GZ:%.2f,T:%.2fC\nH:%.2f\nP:%.2f\n",
-        accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure);
+    try {
+        tmp = sht20.read_temperature();
+        hum = sht20.read_humidity();
+        light = light_get();
+        pressure = bmp.readPressure();
+        M5.IMU.getAccelData(&accX, &accY, &accZ);
+        M5.IMU.getGyroData(&gyroX, &gyroY, &gyroZ);
+        
+        Serial.printf("AX:%.2f,AY:%.2f,AZ:%.2f,GX:%.2f,GY:%.2f,GZ:%.2f,T:%.2fC\nH:%.2f\nP:%.2f\n",
+            accX, accY, accZ, gyroX, gyroY, gyroZ, tmp, hum, pressure);
+        
+    } catch (...) {
+        Serial.println("Error during sensor reading, using previous values");
+    }
 }
 
 void checkAlerts() {
     // Temperature alert
-    if (tmp > tempThreshold) {
+    if (tmp > tempHighThreshold) {
         sendTelegramMessage("🔥 Temperature too high! Over 32°C!");
-        mqttSendAlertFlag(); // Add this line
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
+    }
+
+    if (tmp < tempLowThreshold) {
+        sendTelegramMessage("❄️ Temperature too low! Below 32°C!");
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
     }
 
     // Humidity alert
-    if (hum < humThreshold) {
-        sendTelegramMessage("💧 Humidity too low! Below 70%!");
-        mqttSendAlertFlag(); // Add this line
+    if (hum < humLowThreshold) {
+        sendTelegramMessage("💧 Humidity too low! Below 40%!");
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
+    }
+    if (hum > humHighThreshold) {
+        sendTelegramMessage("💧 Humidity too high! Over 70%!");
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
     }
     
     // Pressure alert
-    if (pressure > pressureThreshold) {
-        sendTelegramMessage("🌪 Pressure too high! Over 1000 hPa!");
-        mqttSendAlertFlag(); // Add this line
+    if (pressure > pressureHighThreshold) {
+        sendTelegramMessage("🌪 Pressure too high! Over 1007 hPa!");
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
+    }
+    if (pressure > pressureLowThreshold) {
+        sendTelegramMessage("🌪 Pressure too low! Below 1001 hPa!");
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
     }
 
     // Sudden movement alert
     if (abs(accX) > axisXThreshold || abs(accY) > axisYThreshold || abs(accZ) > axisZThreshold) {
         sendTelegramMessage("⚠️ Sudden movement detected!");
-        mqttSendAlertFlag(); // Add this line
+        mqttSendAlertFlag();
+        mqttSendAlertFlagCount();
     }
     
     // Optional: Enable light sleep mode
@@ -204,12 +247,16 @@ void sendTelegramMessage(const char* message) {
 }
 
 void checkTelegramMessages() {
+    if (WiFi.status() != WL_CONNECTED) {
+        return;  // Skip if WiFi is not connected
+    }
+    
     HTTPClient http;
-    // Request messages NEWER than the last one we processed
     String url = "https://api.telegram.org/bot" + String(botToken) + 
                  "/getUpdates?offset=" + String(lastProcessedUpdateId + 1) + "&limit=1";
     
     http.begin(url);
+    http.setTimeout(5000);  // Set timeout to 5 seconds
     int httpResponseCode = http.GET();
     
     if (httpResponseCode > 0) {
@@ -225,9 +272,24 @@ void checkTelegramMessages() {
             if (updateId > lastProcessedUpdateId) {
                 lastProcessedUpdateId = updateId;
                 
-                // Check for commands
-                if (response.indexOf("\"/status\"") != -1) {
-                    sendStatusUpdate();
+                // Extract the message text
+                int textPos = response.indexOf("\"text\":\"");
+                if (textPos > 0) {
+                    // Find the end of the text field
+                    int textEndPos = response.indexOf("\"", textPos + 8);
+                    if (textEndPos > textPos) {
+                        // Extract the message text
+                        String messageText = response.substring(textPos + 8, textEndPos);
+                        Serial.println("Received message: " + messageText);
+                        
+                        // Queue the command instead of executing immediately
+                        if (messageText == "/status") {
+                            Serial.println("Status command received - queued for processing");
+                            pendingStatusRequest = true;
+                            // Send acknowledgment immediately
+                            sendTelegramMessage("Command received! Processing status update...");
+                        }
+                    }
                 }
             }
         }
@@ -237,24 +299,33 @@ void checkTelegramMessages() {
 
 void sendStatusUpdate() {
     char message[250];
+    unsigned long timeToNext = 0;
+    if (nextUpdateTime > millis()) {
+        timeToNext = (nextUpdateTime - millis()) / 1000;
+    }
+    
     snprintf(message, sizeof(message), 
              "📊 Status Report:\n"
-             "Temperature: %.2f°C\n"
-             "Humidity: %.2f%%\n"
-             "Pressure: %.2f Pa\n"
-             "Acceleration: X=%.2f Y=%.2f Z=%.2f\n"
-             "Gyro: X=%.2f Y=%.2f Z=%.2f\n"
-             "light: %d\n"
-             "Update every %lu secound\n"
-             "Next update in %lu secound", 
-             tmp, hum, pressure, accX, accY, accZ, gyroX, gyroY, gyroZ,light,
-             sleepTime, nextUpdateTime - millis() / 1000);
+             "Temperature: %.1f°C\n"
+             "Humidity: %.1f%%\n"
+             "Pressure: %.0f Pa\n"
+             "Acceleration:\n"
+             "X=%.2f Y=%.2f Z=%.2f\n"
+             "Light: %d\n"
+             "Update every %lu sec\n"
+             "Next update in %lu sec", 
+             tmp, hum, pressure,
+             accX, accY, accZ, light,
+             sleepTime, timeToNext);
+
+    // Send first part immediately
     sendTelegramMessage(message);
+    
+    Serial.println("Status update sent successfully");
 }
 
 bool checkMqttConnection() {
     if (!mqttClient.connected()) {
-        // Only try to reconnect at certain intervals to avoid blocking
         if (millis() - lastMqttReconnectAttempt > mqttReconnectInterval) {
             lastMqttReconnectAttempt = millis();
             if (!reconnectMQTT()) {
@@ -262,7 +333,7 @@ bool checkMqttConnection() {
                 return false;
             }
         } else {
-            return false; // Skip this attempt if we're waiting for reconnect interval
+            return false; 
         }
     }
     return true;
@@ -279,12 +350,6 @@ bool reconnectMQTT() {
         // Attempt to connect
         if (mqttClient.connect(clientId.c_str())) {
             Serial.println("connected");
-            
-            // Subscribe to alert flag topic
-            mqttClient.subscribe(MQTT_TOPIC_ALERT_FLAG);
-            Serial.print("Subscribed to topic: ");
-            Serial.println(MQTT_TOPIC_ALERT_FLAG);
-            
             return true;
         } else {
             Serial.print("failed, rc=");
@@ -338,6 +403,32 @@ void mqttSendAlertFlag() {
         Serial.println("MQTT alert flag published successfully");
     } else {
         Serial.println("Failed to publish MQTT alert flag");
+    }
+    
+    // Process any incoming messages
+    mqttClient.loop();
+}
+
+void mqttSendAlertFlagCount() {
+    if (!checkMqttConnection()) {
+        return; // Exit if not connected
+    }
+
+    // Increment alert counter
+    alertCount++;
+    
+    doc.clear();
+    doc["timestamp"] = millis();
+    doc["alert_flag_count"] = alertCount;
+   
+    // Serialize to JSON and publish
+    serializeJson(doc, payload);
+    bool published = mqttClient.publish(MQTT_TOPIC_ALERT_FLAG_COUNT, payload);
+    
+    if (published) {
+        Serial.println("MQTT alert count published successfully");
+    } else {
+        Serial.println("Failed to publish MQTT alert count");
     }
     
     // Process any incoming messages

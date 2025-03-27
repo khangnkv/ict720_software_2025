@@ -3,6 +3,6 @@ db.createUser({
     pwd: "dbpasswd",
     roles: [{
         role: "readWrite",
-        db: "babyMonitor_db"
+        db: "babyCare_db"
     }]
 });

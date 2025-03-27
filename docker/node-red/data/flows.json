@@ -1,0 +1,785 @@
+[
+    {
+        "id": "841176a8ea822f9c",
+        "type": "tab",
+        "label": "Recovered Nodes",
+        "disabled": false,
+        "info": "The nodes on this flow were missing a valid flow id when they were imported. They have been added to this flow so you can either restore or delete them.",
+        "env": []
+    },
+    {
+        "id": "766ccc3f1b4fba25",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a0989ffc992d1128",
+        "type": "ui_tab",
+        "name": "BabyMonitor",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "82a867b10c97f4e6",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "5e034bb56c49c9db",
+        "type": "ui_group",
+        "name": "Dashboard",
+        "tab": "a0989ffc992d1128",
+        "order": 1,
+        "disp": true,
+        "width": 30,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9fd7ace586db554a",
+        "type": "mqtt-broker",
+        "name": "Mosquitto",
+        "broker": "mosquitto",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "telegram-bot-config",
+        "type": "telegram bot",
+        "botname": "BabyMonitorBot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "webhook",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "",
+        "sockspassword": "",
+        "bothost": " http://localhost:1880",
+        "botpath": "/telegram-webhook",
+        "localbothost": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "dashboard-link-endpoint",
+        "type": "http in",
+        "z": "841176a8ea822f9c",
+        "name": "Dashboard Link API",
+        "url": "/api/dashboard",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 620,
+        "wires": [
+            [
+                "prepare-telegram-message"
+            ]
+        ]
+    },
+    {
+        "id": "prepare-telegram-message",
+        "type": "function",
+        "z": "841176a8ea822f9c",
+        "name": "Prepare Dashboard Link",
+        "func": "// Get the host IP from the request headers or use a default\nconst host = msg.req.headers.host ? msg.req.headers.host.split(':')[0] : \"192.168.1.26\";\n\n// Create a new message object instead of modifying the existing one\nconst newMsg = {\n    payload: {\n        chatId: \"-4646258185\", // Changed to use the group chat ID from your bot config\n        type: \"message\",\n        content: \"📊 *Baby Monitor Dashboard*\\n\\nTo view your dashboard, access this URL on your local network:\\n\\nhttp://\" + host + \":1880/ui\\n\\n_This link only works when connected to your home network._\"\n    }\n};\n\n// Return the new message object\nreturn newMsg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 620,
+        "wires": [
+            [
+                "send-telegram-message"
+            ]
+        ]
+    },
+    {
+        "id": "send-telegram-message",
+        "type": "telegram sender",
+        "z": "841176a8ea822f9c",
+        "name": "Send to Telegram",
+        "bot": "telegram-bot-config",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 710,
+        "y": 620,
+        "wires": [
+            [
+                "http-response"
+            ]
+        ]
+    },
+    {
+        "id": "http-response",
+        "type": "http response",
+        "z": "841176a8ea822f9c",
+        "name": "HTTP Response",
+        "statusCode": "200",
+        "headers": {},
+        "x": 950,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "884b2c1772fbd462",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "function 1",
+        "func": "msg.payload = msg.payload.noise;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 180,
+        "wires": [
+            [
+                "c2d9d45d9921c189",
+                "ca9567ef698c2ab2",
+                "f7e69950df50440c"
+            ]
+        ]
+    },
+    {
+        "id": "cd5ca8eb2730e7c2",
+        "type": "mqtt in",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "topic": "ict720/babyCare/noise",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "9fd7ace586db554a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 260,
+        "y": 180,
+        "wires": [
+            [
+                "884b2c1772fbd462",
+                "bb67d49427ffbb9f"
+            ]
+        ]
+    },
+    {
+        "id": "c2d9d45d9921c189",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 1,
+        "width": 10,
+        "height": 6,
+        "label": "Noise (dB)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "80",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 710,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bb67d49427ffbb9f",
+        "type": "debug",
+        "z": "766ccc3f1b4fba25",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "ca9567ef698c2ab2",
+        "type": "ui_gauge",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 2,
+        "width": 10,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Noise",
+        "label": "dB",
+        "format": "{{msg.payload}}",
+        "min": 0,
+        "max": "60",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 710,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "f7e69950df50440c",
+        "type": "debug",
+        "z": "766ccc3f1b4fba25",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "24a37cc947163676",
+        "type": "mqtt in",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "topic": "ict720/babyCare/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "9fd7ace586db554a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 260,
+        "y": 320,
+        "wires": [
+            [
+                "b5b18ee9ebb9037c",
+                "1c9b7e2b826d2a64",
+                "25fcb2b8074a949f",
+                "77f4b1a3bed7c546"
+            ]
+        ]
+    },
+    {
+        "id": "b5b18ee9ebb9037c",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "Temperature",
+        "func": "msg.payload = msg.payload.temperature;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 320,
+        "wires": [
+            [
+                "4f7732719b0e4d66",
+                "dc446c3ccab0a3c4"
+            ]
+        ]
+    },
+    {
+        "id": "1c9b7e2b826d2a64",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "Pressure",
+        "func": "msg.payload = msg.payload.pressure;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 360,
+        "wires": [
+            [
+                "dd400492da9c41b8"
+            ]
+        ]
+    },
+    {
+        "id": "25fcb2b8074a949f",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "Humidity",
+        "func": "msg.payload = msg.payload.humidity;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 400,
+        "wires": [
+            [
+                "261b89aca6185483"
+            ]
+        ]
+    },
+    {
+        "id": "77f4b1a3bed7c546",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "Light",
+        "func": "msg.payload = msg.payload.light;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 440,
+        "wires": [
+            [
+                "a79e7864c1eb206f"
+            ]
+        ]
+    },
+    {
+        "id": "8c059310195ee3e1",
+        "type": "function",
+        "z": "766ccc3f1b4fba25",
+        "name": "Alert Count",
+        "func": "msg.payload = msg.payload.alert_flag_count;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 540,
+        "wires": [
+            [
+                "4a2fa1489d234f80"
+            ]
+        ]
+    },
+    {
+        "id": "4f7732719b0e4d66",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 3,
+        "width": 10,
+        "height": 6,
+        "label": "Temperature (°C)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "15",
+        "ymax": "50",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dd400492da9c41b8",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 5,
+        "width": 10,
+        "height": 6,
+        "label": "Pressure (psi)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "100000",
+        "ymax": "100600",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 760,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "261b89aca6185483",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 6,
+        "width": 10,
+        "height": 6,
+        "label": "Humidity (%)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 750,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a79e7864c1eb206f",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 7,
+        "width": 10,
+        "height": 6,
+        "label": "Light (Lux)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "6500",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 750,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "05a2f7713845fec7",
+        "type": "mqtt in",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "topic": "ict720/babyCare/count",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "9fd7ace586db554a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 540,
+        "wires": [
+            [
+                "8c059310195ee3e1"
+            ]
+        ]
+    },
+    {
+        "id": "4a2fa1489d234f80",
+        "type": "ui_chart",
+        "z": "766ccc3f1b4fba25",
+        "name": "",
+        "group": "5e034bb56c49c9db",
+        "order": 4,
+        "width": 10,
+        "height": 3,
+        "label": "Alert Count",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 730,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc446c3ccab0a3c4",
+        "type": "debug",
+        "z": "766ccc3f1b4fba25",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 280,
+        "wires": []
+    }
+]

@@ -42,7 +42,7 @@ def on_message(client, userdata, msg):
             alert_count = data.get('alert_count')
             
             # Store in SQLite
-            c.execute('''INSERT INTO babyMonitor 
+            c.execute('''INSERT INTO babyCare 
                         (timestamp, alert_count, message_type) 
                         VALUES (?, ?, ?)''', 
                         (datetime.now().isoformat(), alert_count, 'alert'))
@@ -65,21 +65,12 @@ def on_message(client, userdata, msg):
             noise_level = data.get('noise')
             
             # Store in SQLite
-            c.execute('''INSERT INTO babyMonitor 
+            c.execute('''INSERT INTO babyCare 
                         (timestamp, noise_level, message_type) 
                         VALUES (?, ?, ?)''', 
                         (datetime.now().isoformat(), noise_level, 'noise'))
             conn.commit()
         
-        # Handle alert flag messages from M5StickC
-        elif msg.topic.split('/')[-1] == "alertflag":
-            # Store in SQLite
-            c.execute('''INSERT INTO babyMonitor 
-                        (timestamp, message_type) 
-                        VALUES (?, ?)''', 
-                        (datetime.now().isoformat(), 'alert_flag'))
-            conn.commit()
-
             # Store in MongoDB
             db = mongo_client[mongo_db]
             mongo_collection = db['noise']
@@ -90,19 +81,97 @@ def on_message(client, userdata, msg):
             })
             print(mongo_collection.count_documents({}))
             print("Inserted to MongoDB")
+            
+        elif msg.topic.split('/')[-1] == "alertflag":
+            # Store in SQLite
+            c.execute('''INSERT INTO babyCare 
+                        (timestamp, message_type) 
+                        VALUES (?, ?)''', 
+                        (datetime.now().isoformat(), 'alert_flag'))
+            conn.commit()
+
+
+        # Handle alert flag messages from M5StickC
+        elif msg.topic.split('/')[-1] == "count":
+            timestamp = data.get('timestamp')
+            alert_flag_count = data.get('alert_flag_count')
+            
+            # Store in SQLite
+            c.execute('''INSERT INTO babyCare
+                (timestamp, alert_flag_count, message_type) 
+                VALUES (?, ?, ?)''', 
+                (datetime.now().isoformat(), alert_flag_count, 'alert_flag_count'))
+            conn.commit()
+            
+            # Store in MongoDB
+            db = mongo_client[mongo_db]
+            mongo_collection = db['alert_flags_count']
+            mongo_collection.insert_one({
+            'timestamp': datetime.now().isoformat(),
+            'alert_flag_count': alert_flag_count,
+            'message_type': 'alert_flag_count'
+            })
+            print(mongo_collection.count_documents({}))
+            print("Alert flag count inserted to MongoDB")
+
+        # Handle sensor data from M5StickC
+        elif msg.topic.split('/')[-1] == "status":
+            # Extract sensor values
+            timestamp = data.get('timestamp')
+            temperature = data.get('temperature')
+            humidity = data.get('humidity')
+            pressure = data.get('pressure')
+            light = data.get('light')
+            acc_x = data.get('acc_x')
+            acc_y = data.get('acc_y')
+            acc_z = data.get('acc_z')
+            
+            # Store in SQLite - just store essential data
+            c.execute('''INSERT INTO babyCare 
+                        (timestamp, temperature, humidity, pressure, light, acc_x, acc_y, acc_z, message_type) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                        (datetime.now().isoformat(), temperature, humidity, pressure, light, acc_x, acc_y, acc_z, 'sensor_data')) 
+            conn.commit()
+            
+            # Store in MongoDB - store all data
+            db = mongo_client[mongo_db]
+            mongo_collection = db['sensor_data']
+            mongo_collection.insert_one({
+                'timestamp': datetime.now().isoformat(),
+                'device_time': timestamp,
+                'temperature': temperature,
+                'humidity': humidity,
+                'pressure': pressure,
+                'light': light,
+                'acceleration': {
+                    'x': acc_x,
+                    'y': acc_y,
+                    'z': acc_z
+                },
+                'message_type': 'sensor_data'
+            })
+            print(f"Sensor data inserted. Total records: {mongo_collection.count_documents({})}")
          
     
     except Exception as e:
         print(f"Error processing message: {e}")
 
 # init SQLite
-conn = sqlite3.connect('babyMonitor.db')
+conn = sqlite3.connect('babyCare.db')
 c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS babyMonitor (
+c.execute('''CREATE TABLE IF NOT EXISTS babyCare (
           _id INTEGER PRIMARY KEY AUTOINCREMENT,
           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
           alert_count INTEGER,
+          alert_flag_count INTEGER,
           noise_level FLOAT,
+          temperature FLOAT,
+            humidity FLOAT,
+            pressure FLOAT,
+            light FLOAT,
+            acc_x FLOAT,
+            acc_y FLOAT,
+            acc_z FLOAT,
           message_type TEXT
           )''')
 conn.commit()

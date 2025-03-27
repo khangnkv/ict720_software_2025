@@ -1,20 +1,18 @@
 //set the ssid and password of the wifi
-const char* ssid = "BY_DOM_2.4G";
-const char* password = "0961873889";
+const char* ssid = -
+const char* password = -
 
 //set the token and chat id of the telegram bot
-// const char* botToken = "8091802131:AAFXAfn0aJEIVAV1NnTDHh4v8WpVcY8wuC4";
-// const char* chatID = "-4646258185";
-const char* botToken = "8014819411:AAGoPCj--tjormpguatqeDhNwC6NwwU4ikM";
-const char* chatID = "5854488746";
+const char* botToken = -
+const char* chatID = -
 
 // Mqtt settings
-#define MQTT_BROKER       "192.168.1.26"
+#define MQTT_BROKER       -
 #define MQTT_PORT         1883
-#define MQTT_CLIENT_ID    "babyMonitor_Tsimcam"
-#define MQTT_TOPIC_ALERT  "ict720/babyMonitor/alertcount"
-#define MQTT_TOPIC_NOISE  "ict720/babyMonitor/noise"
-#define MQTT_TOPIC_ALERT_FLAG "ict720/babyMonitor/alertflag"
+#define MQTT_CLIENT_ID    "babyCare_Tsimcam"
+#define MQTT_TOPIC_ALERT  "ict720/babyCare/alertcount"
+#define MQTT_TOPIC_NOISE  "ict720/babyCare/noise"
+#define MQTT_TOPIC_ALERT_FLAG "ict720/babyCare/alertflag"
 
 // Set the baud rate for serial communication
 #define baud_rate 115200
@@ -58,11 +56,6 @@ const char* chatID = "5854488746";
 #define MIC_SAMPLE_RATE 16000
 const int noiseThreshold = 50; // Noise threshold in dB
 
-
-// Set the alert cooldown period in milliseconds
-unsigned long lastAlertTime = 0; // Track the last alert time
-const unsigned long alertCooldown = 60000; // Cooldown period in milliseconds (e.g., 60 seconds) 
-
 // Define the maximum number of images to capture
 #define MAX_IMAGES 10
 
@@ -72,11 +65,8 @@ int loopDelay = 500;
 //Image capture delay
 int imageCaptureDelay = 500;
 
-//Alert keywords to check for
-// const char* alertKeywords[] = {
-//   "🔥 Temperature too high! Over 32°C!",
-//     "\\ud83d\\udd25 Temperature too high! Over 32\\u00b0C!",
-//     "\\ud83d\\udca7 Humidity too low! Below 70%!",
-//     "\\ud83c\\udf2a Pressure too high! Over 1000 hPa!",
-//     "\\u26a0\\ufe0f Sudden movement detected!"
-//   };
+// Cooldown period in milliseconds (e.g., 60 seconds)
+const unsigned long alertCooldown = 60000; 
+
+// Reconnect interval in milliseconds
+const unsigned long mqttReconnectInterval = 5000;

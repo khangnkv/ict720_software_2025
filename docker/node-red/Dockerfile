@@ -1,8 +1,13 @@
 FROM nodered/node-red:latest
 
-# Install required Node-RED modules for your baby monitor project
-RUN npm install --no-cache-dir --unsafe-perm node-red-dashboard && \
-    npm install --no-cache-dir --unsafe-perm node-red-node-mongodb
+# Install Node-RED nodes first
+RUN npm install node-red-dashboard && \
+    npm install node-red-node-mongodb && \
+    npm install node-red-contrib-mqtt-broker && \
+    npm install node-red-contrib-telegrambot
 
-# Expose the Node-RED port
+
+USER root
+RUN mkdir -p /data && chown -R node-red:node-red /data
+USER node-red
 EXPOSE 1880

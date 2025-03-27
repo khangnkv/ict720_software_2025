@@ -54,6 +54,4 @@ services:
             - MQTT_PORT=1883
             - MQTT_TOPIC=ict720/babyMonitor/
         volumes:
-         - node_red_data:/data
-volumes:
-    node_red_data:
+         - ./node-red/data:/data 

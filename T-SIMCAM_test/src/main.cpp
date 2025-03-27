@@ -22,6 +22,7 @@ void sendTelegramMessage(const char* message);
 void sendTelegramPhoto(const uint8_t* buffer, size_t length);
 void sendTelegramPhotosAsGroup(std::vector<std::pair<const uint8_t*, size_t>> images);
 int captureImages(int numImages);
+void captureAndSendImages();
 void flushCameraBuffer();
 void freeImageBuffers(int numImages);
 void checkTelegramCommand();
@@ -49,15 +50,17 @@ long lastUpdateId = 0;
 bool alertCooldownEnabled = true; 
 unsigned int noiseAlertCount = 0;
 
+// Set the alert cooldown period in milliseconds
+unsigned long lastAlertTime = 0; // Track the last alert time
+
 //mqtt variables
 char payload[256]; // Buffer for MQTT payload
 unsigned long lastMqttReconnectAttempt = 0;
-const unsigned long mqttReconnectInterval = 5000;// Reconnect interval in milliseconds
 
 void setup() {
   // Initialize serial communication
   Serial.begin(baud_rate);
-  Serial.println("Starting Baby Monitor...");
+  Serial.println("Starting BabyCare...");
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   Serial.print("Connecting to Wi-Fi");
@@ -78,9 +81,16 @@ void setup() {
 
   //connect to MQTT broker
   mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
-  mqttClient.connect(MQTT_CLIENT_ID);
   mqttClient.setCallback(mqttCallback);
+  mqttClient.connect(MQTT_CLIENT_ID);
   Serial.println("Connected to MQTT broker");
+
+
+    if (mqttClient.subscribe(MQTT_TOPIC_ALERT_FLAG)) {
+      Serial.println("Successfully subscribed to: " + String(MQTT_TOPIC_ALERT_FLAG));
+    } else {
+      Serial.println("Failed to subscribe to alert topic!");
+    }
 
   // Initialize microphone
   hw_mic_init(MIC_SAMPLE_RATE);
@@ -132,9 +142,8 @@ void setup() {
   }
 
   //notify in chat tha baby monitor is started
-  sendTelegramMessage("ESP32 Baby Monitor started successfully ( ˶ˆᗜˆ˵ )");
+  sendTelegramMessage("ESP32 BabyCare+ ready to monitor your baby's room! ( ˶ˆᗜˆ˵ )");
   sendTelegramMessage("Type /help to see available commands.");
-
 }
 
 void loop() {
@@ -149,7 +158,10 @@ void loop() {
   if (!mqttClient.connected()) {
     reconnectMQTT();
   }
-  mqttClient.loop();
+  for (int i = 0; i < 5; i++) {
+    mqttClient.loop();
+    delay(10); // Small non-blocking delay
+  }
 
 
   // Send alert if noise exceeds threshold
@@ -163,7 +175,6 @@ void loop() {
 
   // Check for messages from Telegram
   checkTelegramCommand();
-
   // Check for alert keywords in messages
   // checkTelegramAlert();
 
@@ -351,6 +362,27 @@ int captureImages(int numImages) {
   return capturedCount;
 }
 
+void captureAndSendImages() {
+  // Take some pictures
+  int numCaptured = captureImages(MAX_IMAGES);
+  
+  // Send images if available
+  if (numCaptured > 0) {
+    std::vector<std::pair<const uint8_t*, size_t>> images;
+    for (int i = 0; i < numCaptured; i++) {
+      images.push_back({imageBuffers[i], imageSizes[i]});
+    }
+    sendTelegramPhotosAsGroup(images);
+    
+    // Free memory after sending
+    freeImageBuffers(numCaptured);
+    
+  } else {
+    Serial.println("No images captured.");
+    sendTelegramMessage("Sorry, failed to capture images");
+  }
+}
+
 void flushCameraBuffer() {
   // Take and discard a few frames to clear any stale images
   Serial.println("Flushing camera buffer...");
@@ -436,6 +468,9 @@ void checkTelegramCommand() {
                                         sendTelegramMessage(("Alert cooldown is currently " + status).c_str());
                                         return;
                                     }
+                                } else {
+                                    sendTelegramMessage("Invalid alert command. Use /alert cooldown on/off/status");
+                                    return;
                                 }
                              } 
                              else if (command == "photo") {
@@ -460,40 +495,46 @@ void checkTelegramCommand() {
                               }
                               else if (command == "photos") {
                                   Serial.println("Capturing multiple images...");
-                                  int numCaptured = captureImages(MAX_IMAGES);
-                                  if (numCaptured > 0) {
-                                      std::vector<std::pair<const uint8_t*, size_t>> images;
-                                      for (int i = 0; i < numCaptured; i++) {
-                                          images.push_back({imageBuffers[i], imageSizes[i]});
-                                      }
-                                      
-                                      sendTelegramPhotosAsGroup(images);
-                                      
-                                      // Free memory after sending
-                                      freeImageBuffers(numCaptured);
-                                  } else {
-                                      Serial.println("No images captured.");
-                                      sendTelegramMessage("❌ Sorry, failed to capture images");
-                                  }
+                                  captureAndSendImages();
                               }
+                              
                               else if (command == "noise") {
                                   num_samples = MIC_SAMPLE_COUNT;
                                   hw_mic_read(mic_samples, &num_samples);
                                   float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
                                   sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
                               }
+                              else if (command == "status") {
+                                  return;
+                              }
+                              // Add this to your checkTelegramCommand() function
+                              else if (command == "dashboard") {
+                                Serial.println("Requesting dashboard link...");
+                                sendTelegramMessage("📊 Requesting dashboard link, please wait...");
+                                
+                                // Make HTTP request to your Node-RED instance
+                                HTTPClient http;
+                                String url = "http://" + String(MQTT_BROKER) + ":1880/api/dashboard";
+                                
+                                http.begin(url);
+                                int responseCode = http.GET();
+                                
+                                http.end();
+                              }
                               else if (command == "help") {
                                   // Send help message with available commands
                                   String helpMsg = "ESP32 Available commands:\n";
                                   helpMsg += "/photo - Take a single photo\n";
                                   helpMsg += "/photos - Take multiple photos\n";
-                                  helpMsg += "/alert cooldown on - Enable alert cooldown\n";
+                                  helpMsg += "/alert cooldown on - Enable alert cooldown " + String(alertCooldown/1000) + " secound\n";
                                   helpMsg += "/alert cooldown off - Disable alert cooldown\n";
                                   helpMsg += "/alert cooldown status - Check cooldown status\n";
                                   helpMsg += "/noise - Check current noise level\n";
                                   helpMsg += "/status - Check current environment status(Requieres M5&Yunhat)\n";
+                                  helpMsg += "/dashboard - Get a link to view the dashboard (local network only)\n";  
                                   helpMsg += "/help - Show this help message";
                                   sendTelegramMessage(helpMsg.c_str());
+                                  sendTelegramMessage("!!!If command is not working, please wait until the other process to finish!!!");
                               }
                               else {
                                   sendTelegramMessage("Invalid command. Type /help to see available commands.");
@@ -512,104 +553,6 @@ void checkTelegramCommand() {
   http.end();
 }
 
-// // Check for alert keywords in Telegram messages
-// void checkTelegramAlert() {
-//   // Get updates from Telegram
-//   String url = "https://api.telegram.org/bot" + String(botToken) + "/getUpdates?offset=" + String(lastUpdateId + 1);
-//   http.begin(url);
-  
-//   int httpResponseCode = http.GET();
-
-//   if (httpResponseCode > 0) {
-//       String response = http.getString();
-      
-//       // Check if there are any updates in the response
-//       if (response.indexOf("\"ok\":true") != -1 && response.indexOf("\"result\":[{") != -1) {
-//           // Extract update_id
-//           int updateIdPos = response.indexOf("\"update_id\":");
-//           if (updateIdPos != -1) {
-//               updateIdPos += 12; // Length of "update_id":
-//               int updateIdEnd = response.indexOf(",", updateIdPos);
-//               if (updateIdEnd != -1) {
-//                   // Get current update ID
-//                   String updateIdStr = response.substring(updateIdPos, updateIdEnd);
-//                   long currentUpdateId = updateIdStr.toInt();
-                  
-//                   // Extract message text
-//                   int textPos = response.indexOf("\"text\":\"");
-//                   if (textPos != -1) {
-//                       textPos += 8; // Length of "text":"
-//                       int textEnd = response.indexOf("\"", textPos);
-//                       if (textEnd != -1) {
-//                         String messageText = response.substring(textPos, textEnd);
-//                         // Add debug info
-//                         Serial.println("Raw message: " + messageText);
-//                         Serial.print("Message bytes: ");
-//                         for (int i = 0; i < messageText.length() && i < 20; i++) {
-//                           Serial.print(String((byte)messageText.charAt(i), HEX) + " ");
-//                         }
-//                         Serial.println();
-                        
-//                         // Skip if it's a command (starts with /)
-//                         if (messageText.length() > 0 && messageText.charAt(0) == '/') {
-//                             // Let checkTelegramCommand handle this message
-//                             http.end();
-//                             return;
-//                         }
-                    
-//                         const int numAlertKeywords = sizeof(alertKeywords) / sizeof(alertKeywords[0]);
-//                         // Check for any alert keyword
-//                         bool foundAlertKeyword = false;
-//                         for (int i = 0; i < numAlertKeywords; i++) {
-//                             // Debug output to see what we're checking for
-//                             Serial.println("Checking for keyword: \"" + String(alertKeywords[i]) + "\"");
-//                             if (messageText.indexOf(alertKeywords[i]) != -1) {
-//                                 foundAlertKeyword = true;
-//                                 Serial.println("Alert keyword found: " + String(alertKeywords[i]));
-//                                 break;
-//                             }
-//                         }
-                      
-//                         // Update last processed ID (only if not a command)
-//                         lastUpdateId = currentUpdateId;
-                        
-//                         // If alert keyword found, send alert response
-//                         if (foundAlertKeyword) {
-//                             Serial.println("Alert  detected! Capturing images...");
-//                               sendTelegramMessage("🚨Alert detected! Checking baby's room...");
-                              
-//                               // Capture images and send them
-//                               int numCaptured = captureImages(MAX_IMAGES);
-//                               if (numCaptured > 0) {
-//                                   std::vector<std::pair<const uint8_t*, size_t>> images;
-//                                   for (int i = 0; i < numCaptured; i++) {
-//                                       images.push_back({imageBuffers[i], imageSizes[i]});
-//                                   }
-                                  
-//                                   sendTelegramPhotosAsGroup(images);
-                                  
-//                                   // Check noise level
-//                                   num_samples = MIC_SAMPLE_COUNT;
-//                                   hw_mic_read(mic_samples, &num_samples);
-//                                   float noiseLevel_dB = calculateNoiseLevel(mic_samples, num_samples);
-//                                   sendTelegramMessage(("Current noise level: " + String(noiseLevel_dB) + " dB").c_str());
-                                  
-//                                   // Free memory after sending
-//                                   freeImageBuffers(numCaptured);
-//                               } else {
-//                                   Serial.println("No images captured.");
-//                                   sendTelegramMessage("❌ Sorry, failed to capture images");
-//                               }
-//                           }
-//                       }
-//                   }
-//               }
-//           }
-//       }
-//   }
-//   http.end();
-// }
-
 // Send alert with noise level and capture/send images
 void sendNoiseAlert(float noiseLevel_dB) {
   sendTelegramMessage("🚨 Noise detected in baby's room! 🚨");
@@ -618,26 +561,14 @@ void sendNoiseAlert(float noiseLevel_dB) {
   // Increment alert count
   
   // Capture 10 images
-  int numCaptured = captureImages(MAX_IMAGES);
-  if (numCaptured > 0) {
-    std::vector<std::pair<const uint8_t*, size_t>> images;
-    for (int i = 0; i < numCaptured; i++) {
-      images.push_back({imageBuffers[i], imageSizes[i]});
-    }
-    sendTelegramPhotosAsGroup(images);
-    
-    // Free memory after sending - FIXED: Only free what was captured
-    freeImageBuffers(numCaptured);
+  captureAndSendImages();
 
-    // Increment alert count
-    noiseAlertCount++;
-    mqttSendAlertCount();
+  // Increment alert count
+  
+  noiseAlertCount++;
+  mqttSendAlertCount();
 
-  } else {
-    Serial.println("No images captured.");
-  }
 }
-
 
 void mqttSendNoiseData(float noiseLevel_dB) {
   if (!checkMqttConnection()) {
@@ -707,12 +638,8 @@ bool reconnectMQTT() {
   if (!mqttClient.connected()) {
     Serial.print("Attempting MQTT connection...");
     
-    // Create a random client ID
-    String clientId = MQTT_CLIENT_ID;
-    clientId += String(random(0xffff), HEX);
-    
     // Attempt to connect
-    if (mqttClient.connect(clientId.c_str())) {
+    if (mqttClient.connect(MQTT_CLIENT_ID)) {
       Serial.println("connected");
       
       // Subscribe to alert flag topic
@@ -731,14 +658,16 @@ bool reconnectMQTT() {
   return true;
 }
 
+
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.println(topic);
-  
+
   // Create a null-terminated string from the payload
-  char message[length + 1];
-  memcpy(message, payload, length);
-  message[length] = '\0';
+  char message[256]; // Use a fixed size buffer
+  unsigned int copyLength = length < sizeof(message)-1 ? length : sizeof(message)-1;
+  memcpy(message, payload, copyLength);
+  message[copyLength] = '\0';
   
   Serial.print("Message: ");
   Serial.println(message);
@@ -753,23 +682,14 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
       // Send message via Telegram
       sendTelegramMessage("🚨 Alert received from another device! 🚨");
       
-      // Take some pictures
-      int numCaptured = captureImages(MAX_IMAGES);
-      
-      // Send images if available
-      if (numCaptured > 0) {
-        std::vector<std::pair<const uint8_t*, size_t>> images;
-        for (int i = 0; i < numCaptured; i++) {
-          images.push_back({imageBuffers[i], imageSizes[i]});
-        }
-        sendTelegramPhotosAsGroup(images);
-        
-        // Free memory after sending
-        freeImageBuffers(numCaptured);
-      }
+      // Capture and send images
+      captureAndSendImages();
       
       // Update last alert time
       lastAlertTime = millis();
+    }else {
+      sendTelegramMessage("Alert received, but alert cooldown active.");
+      Serial.println("Alert flag received, but alert cooldown active.");
     }
   }
 }
