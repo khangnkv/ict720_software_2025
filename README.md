@@ -74,6 +74,12 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
    **↑User can type "/help" in telegram chat↑**
    <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/photo_command_test-case.png" alt="/photo test Case" width="600" height="350">\
+   **↑User can type "/photo" in telegram chat↑**
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/photos_command_test-case.png" alt="/photos test Case" width="550" height="350">\
+   **↑User can type "/photos" in telegram chat↑**
+   <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/alert-cooldown-on_command_test-case.png" alt="/alert cooldown on test Case" width="600" height="150">\
    **↑User can type "/alert cooldown on" in telegram chat↑**
    <br/><br/>
