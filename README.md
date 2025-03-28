@@ -6,7 +6,7 @@ BabyCare+ is an efficient IoT-based baby monitoring system designed to help pare
 With real-time motion tracking, temperature and humidity monitoring, and instant image capture, BabyCare+ offers a seamless and efficient solution for modern parenting. The integration of smart notifications and remote access allows users to monitor their baby’s environment from anywhere, ensuring peace of mind and quick response to any concerns.
 
 ## Objective
-The primary objective of BabyCare+ is to develop an intelligent baby monitoring system that enhances child safety through real-time alerts and environmental monitoring. Using M5StickC and HAT Yun, the system detects motion, temperature fluctuations, humidity changes, and unusual noise, sending instant notifications to parents via a Telegram bot. Additionally, the T-SIMCAM ESP32-S3 captures images when motion or anomalies are detected, providing a visual update of the baby’s environment.
+The primary objective of BabyCare+ is to develop a baby monitoring system that enhances childcare while minimize attention through real-time alerts and environmental monitoring. Using M5StickC and HAT Yun, the system detects motion, temperature fluctuations, humidity changes, and unusual noise, sending instant notifications to parents via a Telegram bot. Additionally, the T-SIMCAM ESP32-S3 captures images when motion or anomalies are detected, providing a visual update of the baby’s environment.
 
 Key features of the system:
 - **Motion Detection:** Notifies parents when the baby moves or wakes up, detected via **M5StickC**.
