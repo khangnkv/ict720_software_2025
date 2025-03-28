@@ -65,7 +65,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
        - Devices are programmed to turn off based on scheduled settings to conserve energy
        - If an abnormality is detected, the system automatically sends an alert with recorded images or videos
 3. Sequence Diagram
-![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram)
+![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 4. Data Flow Process
 
 5. Data Modeling
