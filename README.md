@@ -98,5 +98,20 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
       <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashbpard_command_test-case.png" alt="/dashboard test Case" width="600" height="300">\
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/temp_test-case.png" alt="Temperature test Case" width="600" height="100">\
+   **↑Temperature alert in telegram chat↑**\
+   <br/><br/>
+  <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/humidity_test-case.png" alt="Humidity test Case" width="600" height="100">\
+   **↑Humidity alert in telegram chat↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_test-case.png" alt="Air Pressure test Case" width="600" height="90">\
+   **↑Air pressure alert in telegram chat↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/noise__test-case.png" alt="Noise test Case" width="600" height="90">\
+   **↑Noise alert in telegram chat↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/motion_test-case.png" alt="Motion test Case" width="600" height="100">\
+   **↑Motion alert in telegram chat↑**\
+   <br/><br/>
 9. Conclusion
 This project aims to enhance the quality of life for parents and babysitter users by integrating temperature, motion, and noise tracking at home. By leveraging IoT devices, the system can provide in-detail analysis that further improving safety, quality of life, and efficiency for every first-time parents.
