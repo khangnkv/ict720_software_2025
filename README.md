@@ -122,6 +122,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    **↑Dashboard example↑**\
    <br/><br/>
 9. Conclusion
+
 BabyCare+ is designed to provide parents and caregivers with a smarter, more efficient way to monitor a baby’s safety and well-being. By integrating IoT technology, real-time data collection, and an intuitive Telegram chatbot, the system ensures that parents receive immediate alerts about movement, environmental changes, and unusual noise levels. This solution provides peace of mind by allowing parents to stay informed without constant manual checks.
 
 With its ability to analyze motion, temperature, humidity, and other environmental factors, BabyCare+ provides a comprehensive monitoring experience tailored to the needs of first-time parents and babysitters. By combining automation, real-time alerts, and remote access, this project contributes to a safer and more convenient parenting experience, ultimately improving the quality of life for both parents and their children.
