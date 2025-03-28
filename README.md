@@ -52,16 +52,17 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
 ![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)
 ## System Architecture
    ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/system_architecture.png)
-    1. Environment and Noise Tracking
-       - M5StickC: Detects motion abnormalities
-       - Yun Hat: Assists with environmental sensing
-       - T-SIMCAM ESP32-S3: Captures images and noise when alerts are triggered or when requested
-       - Wi-Fi Transmission: Sends all collected data to the database 
-       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.
-    2. Manual Control
-       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status
-    3. Safety
-       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
+    1. **Environment and Noise Tracking**\
+          - **M5StickC:** Detects motion abnormalities\
+          - **Yun Hat:** Assists with environmental sensing\
+          - **T-SIMCAM ESP32-S3:** Captures images and noise when alerts are triggered or when requested\
+          - **Wi-Fi Transmission:** Sends all collected data to the database\
+          - **Data Storage and Analysis:** Detects irregular movement, temperature spikes, noise disturbances, etc.\
+    2. **Manual Control**\
+          - **Manual Control:** Users can give commands to Telegram ChatBot to take pictures or current environment status\
+    3. **Safety**\
+          - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
+
 ## Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 ## Data Flow Process
@@ -69,7 +70,8 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
 ## Data Modeling
 ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
-## Telegram Bot Command\
+## Telegram Bot Command
+
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
    **↑User can type "/help" in telegram chat↑**
    <br/><br/>
@@ -101,7 +103,8 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
 
-## Telegram Bot Alert\
+## Telegram Bot Alert
+
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_1.png" alt="/dashboard test Case" width="500" height="500">\
    **↑Example Alert in telegram chat↑**\
    <br/><br/>
