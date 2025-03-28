@@ -72,14 +72,26 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
   ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Baby%20Telegram%20Chatbot.png)
 
 7. Telegram Bot Alert\
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/ALERT_user_input.jpg" alt="ALERT Test Case" width="420" height="700">\
-   **↑User can type a specific word to get the current image of the baby's room↑**\
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/NOISE_detection.jpg" alt="NOISE Test Case" width="420" height="700">\
-   **↑Noise is too loud in the baby's room↑**\
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/TEMPERATURE_detection_input.jpg" alt="Temperature Test Case" width="420" height="700">\
-   **↑Temperature is too high in the baby's room↑**\
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/HUMIDITY_detection_input.jpg" alt="Humidity Test Case" width="420" height="700">\
-   **↑Humidity is not appropriate in the baby's room↑**
-
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
+   **↑User can type "/help" in telegram chat↑**
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/alert-cooldown-on_command_test-case.png" alt="/alert cooldown on test Case" width="600" height="150">\
+   **↑User can type "/alert cooldown on" in telegram chat↑**
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/alert-cooldown-off__command_test-case.png" alt="/alert cooldown off test Case" width="650" height="150">\
+   **↑User can type "/alert cooldown off" in telegram chat↑**\
+   <br/><br/>
+      <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/alert-cooldown-status_command_test-case.png" alt="/alert cooldown status test Case" width="500" height="150">\
+   **↑User can type "/alert cooldown status" in telegram chat↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/noise_command_test-case.png" alt="/noise test Case" width="380" height="150">\
+   **↑User can type "/noise" in telegram chat↑**
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/status_command_test-case.png" alt="/status test Case" width="500" height="350">\
+   **↑User can type "/status" in telegram chat↑**\
+   <br/><br/>
+      <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashbpard_command_test-case.png" alt="/dashboard test Case" width="600" height="300">\
+   **↑User can type "/dashboard" in telegram chat↑**\
+   <br/><br/>
 9. Conclusion
 This project aims to enhance the quality of life for parents and babysitter users by integrating temperature, motion, and noise tracking at home. By leveraging IoT devices, the system can provide in-detail analysis that further improving safety, quality of life, and efficiency for every first-time parents.
