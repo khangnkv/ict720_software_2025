@@ -31,10 +31,9 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 ## User Stories
 1. As a parent, I want to know when my baby needs care at night while ensuring I get enough rest, so I want to receive alerts without needing to constantly check.
-2. As a parent, I want to monitor my babysitter’s performance during working hours to ensure my child is being properly cared for.
-3. As a parent, I want to review recorded video and audio from the camera to verify my child was well cared for throughout the day.
-4. As a babysitter, I want to be alerted if the baby’s room temperature, noise level, or abnormal motion is detected so I can respond promptly.
-5. As a user, I want T-SIMCAM ESP32-S3 to capture and send images when motion is detected or an alert is triggered from M5StickC or Yun Hat (including noise and environmental changes).
+2. As a parent, I want to review recorded images from the camera to verify my child was safe for throughout the day.
+3. As a babysitter, I want to be alerted if the baby’s room temperature, noise level, or abnormal motion is detected so I can respond promptly.
+4. As a parent, I want to get images of the current situation when in my baby room when something is wrong.
 
 
 ## Hardwares
