@@ -54,11 +54,11 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
        - Yun Hat: Assists with environmental sensing
        - T-SIMCAM ESP32-S3: Captures images and noise when alerts are triggered or when requested
        - Wi-Fi Transmission: Sends all collected data to the database 
-       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.
+       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.\
     2. Manual Control
-       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status
+       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status\
     3. Safety
-       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
+       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram\
 ## Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 ## Data Flow Process
