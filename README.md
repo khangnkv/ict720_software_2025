@@ -48,7 +48,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 ## Software Models
 1. State Diagram
-
+![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)\
 2. System Architecture
    ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Blank%20board%20-%20Page%201.png)
     1. Motion, Temperature, and Noise Tracking
@@ -66,9 +66,9 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 3. Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 4. Data Flow Process
-
+![Data Flow Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/dataflow.png)
 5. Data Modeling
-  ![Baby Chatbot Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Baby%20Telegram%20Chatbot.png)
+  ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
 7. Telegram Bot Alert\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
