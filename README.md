@@ -13,7 +13,6 @@ Key features of the system:
 - **Environmental Monitoring:** Tracks real-time temperature, humidity, and air pressure using **Hat YUN**.
 - **Noise Detection:** Alerts parents if loud or unusual noise is detected through **T-SIMCAM ESP32-S3**.
 - **Image Capture:** Sends images from **T-SIMCAM ESP32-S3** when abnormalities occur, providing parents with a clear view of the room’s condition.
-- **Real-time Monitoring:** Parents can manually check the room status by sending specific commands in the Telegram chat, such as "ALERT".
 
 By integrating these features, BabyCare+ ensures that parents receive timely notifications and necessary information, improving overall child safety and simplifying monitoring for both parents and babysitters.
 
