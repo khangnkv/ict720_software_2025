@@ -39,14 +39,14 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
 
 ## Hardwares
 ![M5 Stick C](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539123663.jpg)\
-**↑M5StickC 2019 Edition↑**
+**↑M5StickC 2019 Edition↑**\
 [Documentations and Specifications](https://shop.m5stack.com/products/stick-c?variant=43982750843137)
 ![YUN HAT](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539212655.jpg)\
-**↑M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)↑**
-[Documentations and Specifications](https://docs.m5stack.com/en/hat/hat-yun)
+**↑M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)↑**\
+[Documentations and Specifications](https://docs.m5stack.com/en/hat/hat-yun)\
 ![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/images/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
-**↑T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module↑**
-[Specifications]([https://docs.m5stack.com/en/hat/hat-yun](https://lilygo.cc/products/t-simcam))
+**↑T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module↑**\
+[Specifications](https://lilygo.cc/products/t-simcam)
 
 ## State Diagram
 ![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)
