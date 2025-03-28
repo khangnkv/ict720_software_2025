@@ -58,7 +58,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
     2. Manual Control
        - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status\
     3. Safety
-       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram\
+       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
 ## Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 ## Data Flow Process
