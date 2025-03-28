@@ -37,36 +37,34 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 ## Hardwares
 ![M5 Stick C](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539123663.jpg)\
 **↑M5StickC 2019 Edition↑**
-
+[Documentations and Specifications](https://shop.m5stack.com/products/stick-c?variant=43982750843137)
 ![YUN HAT](https://github.com/khangnkv/ict720_software_2025/blob/main/images/messageImage_1742539212655.jpg)\
 **↑M5StickC Yun Hat attachment (SHT20,BMP280,SK6812)↑**
-
+[Documentations and Specifications](https://docs.m5stack.com/en/hat/hat-yun)
 ![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/images/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
 **↑T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module↑**
-
+[Specifications]([https://docs.m5stack.com/en/hat/hat-yun](https://lilygo.cc/products/t-simcam))
 ## Software Models
 1. State Diagram
 ![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)
 2. System Architecture
-   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Blank%20board%20-%20Page%201.png)
-    1. Motion, Temperature, and Noise Tracking
-       - M5StickC: Detects temperature, noise, and motion abnormalities
+   ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/system_architecture.png)
+    1. Environment and Noise Tracking
+       - M5StickC: Detects motion abnormalities
        - Yun Hat: Assists with environmental sensing
-       - T-SIMCAM ESP32-S3: Captures images when alerts are triggered
-       - Wi-Fi Transmission: Sends all collected data to the server (both local and cloud)
-       - Data Storage and Analysis: Detects irregular movement, temperature spikes, or noise disturbances
-   2. Remote Monitoring & Manual Control
-       - Cloud Dashboard/App: Allows admins to see detailed data and provides summarized insights for parents
-       - Manual Control: Users can remotely turn on/off cameras and devices through the app
-   3. Safety & Energy Efficiency
-       - Devices are programmed to turn off based on scheduled settings to conserve energy
-       - If an abnormality is detected, the system automatically sends an alert with recorded images or videos
+       - T-SIMCAM ESP32-S3: Captures images and noise when alerts are triggered or when requested
+       - Wi-Fi Transmission: Sends all collected data to the database 
+       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.
+   2. Manual Control
+       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status
+   3. Safety
+       - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
 3. Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
 4. Data Flow Process
 ![Data Flow Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/dataflow.png)
 5. Data Modeling
-  ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
+![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
 7. Telegram Bot Alert\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
@@ -118,10 +116,12 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    **↑Humidity too low↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_high.png" alt="Air Pressure low" width="600" height="100">\
-   **↑Air pressure too high↑**\
+   **↑Air pressure too low↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashboard.jpg" alt="Motion test Case" width="700" height="380">\
    **↑Dashboard example↑**\
    <br/><br/>
 9. Conclusion
-This project aims to enhance the quality of life for parents and babysitter users by integrating temperature, motion, and noise tracking at home. By leveraging IoT devices, the system can provide in-detail analysis that further improving safety, quality of life, and efficiency for every first-time parents.
+BabyCare+ is designed to provide parents and caregivers with a smarter, more efficient way to monitor a baby’s safety and well-being. By integrating IoT technology, real-time data collection, and an intuitive Telegram chatbot, the system ensures that parents receive immediate alerts about movement, environmental changes, and unusual noise levels. This solution provides peace of mind by allowing parents to stay informed without constant manual checks.
+
+With its ability to analyze motion, temperature, humidity, and other environmental factors, BabyCare+ provides a comprehensive monitoring experience tailored to the needs of first-time parents and babysitters. By combining automation, real-time alerts, and remote access, this project contributes to a safer and more convenient parenting experience, ultimately improving the quality of life for both parents and their children.
