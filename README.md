@@ -1,18 +1,21 @@
 # Group BabyCare+
 
 ## About the Project
-BabyCare+ is a smart baby monitoring system designed to help parents keep track of their baby's activities and environmental conditions in real time. By integrating IoT devices and a Telegram bot, this system ensures that parents receive immediate notifications when their baby moves or when environmental conditions change. It provides a seamless and efficient way to enhance child safety and comfort.
+BabyCare+ is an efficient IoT-based baby monitoring system designed to help parents and caregivers keep track of their baby's safety and environmental conditions in real time. By integrating M5StickC, HAT Yun, and T-SIMCAM ESP32-S3, along with a Telegram bot, BabyCare+ provides immediate alerts when the baby moves, unusual noise is detected, or environmental conditions change. The system ensures parents stay informed effortlessly, reducing the need for constant manual checks and enhancing child safety and comfort without hurting the wallet.
+
+With real-time motion tracking, temperature and humidity monitoring, and instant image capture, BabyCare+ offers a seamless and efficient solution for modern parenting. The integration of smart notifications and remote access allows users to monitor their baby’s environment from anywhere, ensuring peace of mind and quick response to any concerns.
 
 ## Objective
-  The objective of this project is to develop a baby monitoring system using the **M5StickC** and **HAT Yun** devices, which detect motion and environmental changes and sends real-time notifications/alerts to parents through a **Telegram bot**.
-  The system will ensure that parents are promptly informed when their baby wakes up or moves and will provide environmental data like temperature, humidity, and air pressure from the HAT Yun sensor. Additionally, the system will send an image from the T-SIMCAM ESP32-S3 when motion is detected, giving parents a complete view of the room’s current situation. This solution aims to provide peace of mind to parents by offering real-time alerts and live environmental monitoring in an efficient and timely manner.
-  
-  Key features of the system:
-- **Motion Detection:** Notifies parents when the baby moves or wakes up from the **M5StickC**.  
-- **Environmental Monitoring:** Provides real-time data on surrounding temperature, noise from the **M5StickC**.
-- **Noise Detection:** Notifies parents when the noise is too loud or some weird noise from **T-SIMCAM ESP32-S3**.
-- **Image Capture:** Sends an image from the **T-SIMCAM ESP32-S3** when motion, temperature, humidity, air pressure, and noise are detected, giving parents an alert text with information and a visual update of the room’s condition.
-- **Real-time monitor:** Parents could use a specific word to get the current situation of the room by typing in the telegram chat.  ex. "ALERT"
+The primary objective of BabyCare+ is to develop an intelligent baby monitoring system that enhances child safety through real-time alerts and environmental monitoring. Using M5StickC and HAT Yun, the system detects motion, temperature fluctuations, humidity changes, and unusual noise, sending instant notifications to parents via a Telegram bot. Additionally, the T-SIMCAM ESP32-S3 captures images when motion or anomalies are detected, providing a visual update of the baby’s environment.
+
+Key features of the system:
+- **Motion Detection:** Notifies parents when the baby moves or wakes up, detected via **M5StickC**.
+- **Environmental Monitoring:** Tracks real-time temperature, humidity, and air pressure using **Hat YUN**.
+- **Noise Detection:** Alerts parents if loud or unusual noise is detected through **T-SIMCAM ESP32-S3**.
+- **Image Capture:** Sends images from **T-SIMCAM ESP32-S3** when abnormalities occur, providing parents with a clear view of the room’s condition.
+- **Real-time Monitoring:** Parents can manually check the room status by sending specific commands in the Telegram chat, such as "ALERT".
+
+By integrating these features, BabyCare+ ensures that parents receive timely notifications and necessary information, improving overall child safety and simplifying monitoring for both parents and babysitters.
 
 ## Members
 
@@ -54,9 +57,9 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
        - Yun Hat: Assists with environmental sensing
        - T-SIMCAM ESP32-S3: Captures images and noise when alerts are triggered or when requested
        - Wi-Fi Transmission: Sends all collected data to the database 
-       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.\
+       - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.
     2. Manual Control
-       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status\
+       - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status
     3. Safety
        - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
 ## Sequence Diagram
@@ -66,7 +69,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 ## Data Modeling
 ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
-## Telegram Bot Command
+## Telegram Bot Command\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
    **↑User can type "/help" in telegram chat↑**
    <br/><br/>
@@ -98,7 +101,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
 
-## Telegram Bot Alert
+## Telegram Bot Alert\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_1.png" alt="/dashboard test Case" width="500" height="500">\
    **↑Example Alert in telegram chat↑**\
    <br/><br/>
