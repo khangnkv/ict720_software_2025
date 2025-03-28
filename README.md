@@ -48,7 +48,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 
 ## Software Models
 1. State Diagram
-![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)\
+![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)
 2. System Architecture
    ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/Blank%20board%20-%20Page%201.png)
     1. Motion, Temperature, and Noise Tracking
