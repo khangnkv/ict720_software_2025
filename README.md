@@ -66,7 +66,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 ## Data Modeling
 ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
-## Telegram Bot Command\
+## Telegram Bot Command
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
    **↑User can type "/help" in telegram chat↑**
    <br/><br/>
@@ -98,7 +98,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
 
-## Telegram Bot Alert\
+## Telegram Bot Alert
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_1.png" alt="/dashboard test Case" width="500" height="500">\
    **↑Example Alert in telegram chat↑**\
    <br/><br/>
