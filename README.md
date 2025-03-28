@@ -109,11 +109,11 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/humidity_low.png" alt="Humidity low" width="600" height="100">\
    **↑Humidity too low↑**\
    <br/><br/>
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_test-case.png" alt="Air Pressure test Case" width="600" height="80">\
-   **↑Air pressure too low in telegram chat↑**\
-   <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_high.png" alt="Air Pressure low" width="600" height="100">\
    **↑Air pressure too high↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_test-case.png" alt="Air Pressure test Case" width="600" height="80">\
+   **↑Air pressure too low in telegram chat↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/noise_2.png" alt="Noise test Case" width="500" height="500">\
    **↑Noise alert in telegram chat↑**\
