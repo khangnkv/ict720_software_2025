@@ -1,4 +1,4 @@
-# Group BabyCare+: Baby 
+# Group BabyCare+
 
 ## About the Project
 BabyCare+ is a smart baby monitoring system designed to help parents keep track of their baby's activities and environmental conditions in real time. By integrating IoT devices and a Telegram bot, this system ensures that parents receive immediate notifications when their baby moves or when environmental conditions change. It provides a seamless and efficient way to enhance child safety and comfort.
@@ -44,10 +44,10 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
 ![ESP32 LilyCam](https://github.com/khangnkv/ict720_software_2025/blob/main/images/ESP32-S3-camera-board-mPCIe-socket-720x441.jpg)\
 **↑T-SIMCAM ESP32-S3 CAM with WiFi and Bluetooth Module↑**
 [Specifications]([https://docs.m5stack.com/en/hat/hat-yun](https://lilygo.cc/products/t-simcam))
-## Software Models
-1. State Diagram
+
+## State Diagram
 ![State Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/state_diagram.png)
-2. System Architecture
+## System Architecture
    ![System Architecture](https://github.com/khangnkv/ict720_software_2025/blob/main/images/system_architecture.png)
     1. Environment and Noise Tracking
        - M5StickC: Detects motion abnormalities
@@ -55,18 +55,18 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
        - T-SIMCAM ESP32-S3: Captures images and noise when alerts are triggered or when requested
        - Wi-Fi Transmission: Sends all collected data to the database 
        - Data Storage and Analysis: Detects irregular movement, temperature spikes, noise disturbances, etc.
-   2. Manual Control
+    2. Manual Control
        - Manual Control: Users can give commands to Telegram ChatBot to take pictures or current environment status
-   3. Safety
+    3. Safety
        - If an abnormality is detected, the system automatically sends an alert with captured images through Telegram
-3. Sequence Diagram
+## Sequence Diagram
 ![Sequence Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/sequence-diagram.png)
-4. Data Flow Process
+## Data Flow Process
 ![Data Flow Diagram](https://github.com/khangnkv/ict720_software_2025/blob/main/images/dataflow.png)
-5. Data Modeling
+## Data Modeling
 ![Data Modeling](https://github.com/khangnkv/ict720_software_2025/blob/main/images/data%20modeling.png)
 
-7. Telegram Bot Alert\
+## Telegram Bot Command\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/help_command_test-case.png" alt="/help command test case" width="600" height="400">\
    **↑User can type "/help" in telegram chat↑**
    <br/><br/>
@@ -97,6 +97,8 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
       <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashbpard_command_test-case.png" alt="/dashboard test Case" width="600" height="300">\
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
+
+## Telegram Bot Alert\
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_1.png" alt="/dashboard test Case" width="500" height="500">\
    **↑Example Alert in telegram chat↑**\
    <br/><br/>
@@ -124,7 +126,7 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashboard.jpg" alt="Motion test Case" width="700" height="380">\
    **↑Dashboard example↑**\
    <br/><br/>
-9. Conclusion
+## Conclusion
 
 BabyCare+ is designed to provide parents and caregivers with a smarter, more efficient way to monitor a baby’s safety and well-being. By integrating IoT technology, real-time data collection, and an intuitive Telegram chatbot, the system ensures that parents receive immediate alerts about movement, environmental changes, and unusual noise levels. This solution provides peace of mind by allowing parents to stay informed without constant manual checks.
 
