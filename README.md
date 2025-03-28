@@ -1,5 +1,3 @@
-# ict720_software_2025
-
 # Group BabyCare+: Baby 
 
 ## About the Project
@@ -101,11 +99,8 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
       <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashbpard_command_test-case.png" alt="/dashboard test Case" width="600" height="300">\
    **↑User can type "/dashboard" in telegram chat↑**\
    <br/><br/>
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/temp_test-case.png" alt="Temperature test Case" width="600" height="90">\
-   **↑Temperature alert in telegram chat↑**\
-   <br/><br/>
-  <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/humidity_test-case.png" alt="Humidity test Case" width="600" height="90">\
-   **↑Humidity alert in telegram chat↑**\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_1.png" alt="/dashboard test Case" width="500" height="500">\
+   **↑Example Alert in telegram chat↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_test-case.png" alt="Air Pressure test Case" width="600" height="80">\
    **↑Air pressure alert in telegram chat↑**\
