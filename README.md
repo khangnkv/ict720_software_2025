@@ -105,11 +105,20 @@ BabyCare+ is a smart baby monitoring system designed to help parents keep track 
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_test-case.png" alt="Air Pressure test Case" width="600" height="80">\
    **↑Air pressure alert in telegram chat↑**\
    <br/><br/>
-   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/noise__test-case.png" alt="Noise test Case" width="600" height="80">\
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/noise__test-case.png" alt="Noise test Case" width="500" height="500">\
    **↑Noise alert in telegram chat↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/motion_test-case.png" alt="Motion test Case" width="600" height="100">\
    **↑Motion alert in telegram chat↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/test_2.png" alt="Test case" width="600" height="100">\
+   **↑Temperature too low↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/humidity_low.png" alt="Humidity low" width="600" height="100">\
+   **↑Humidity too low↑**\
+   <br/><br/>
+   <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/pressure_high.png" alt="Air Pressure low" width="600" height="100">\
+   **↑Air pressure too low↑**\
    <br/><br/>
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashboard.jpg" alt="Motion test Case" width="700" height="380">\
    **↑Dashboard example↑**\
