@@ -132,7 +132,7 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
    **↑Dashboard example↑**\
    <br/><br/>
    [![YouTube](https://github.com/khangnkv/ict720_software_2025/blob/main/images/BabyCare_demo.png)](https://www.youtube.com/watch?v=_BTMb7M7MXM)\
-   **↑Go to YouTube Video↑**\
+   **↑Watch the YouTube video here↑**\
    <br/><br/>
 ## Conclusion
 
