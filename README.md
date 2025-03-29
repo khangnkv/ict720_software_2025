@@ -131,6 +131,9 @@ By integrating these features, BabyCare+ ensures that parents receive timely not
    <img src="https://github.com/khangnkv/ict720_software_2025/blob/main/images/dashboard.jpg" alt="Motion test Case" width="700" height="380">\
    **↑Dashboard example↑**\
    <br/><br/>
+   [![YouTube](https://github.com/khangnkv/ict720_software_2025/blob/main/images/BabyCare_demo.png)](https://www.youtube.com/watch?v=_BTMb7M7MXM)\
+   **↑Go to Youtube Video↑**\
+   <br/><br/>
 ## Conclusion
 
 BabyCare+ is designed to provide parents and caregivers with a smarter, more efficient way to monitor a baby’s safety and well-being. By integrating IoT technology, real-time data collection, and an intuitive Telegram chatbot, the system ensures that parents receive immediate alerts about movement, environmental changes, and unusual noise levels. This solution provides peace of mind by allowing parents to stay informed without constant manual checks.
